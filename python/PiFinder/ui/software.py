@@ -7,83 +7,24 @@ This module contains all the UI Module classes
 
 import time
 
-from PiFinder.ui.base import UIModule
-
 try:
     from PiFinder import sys_utils
 except ImportError:
     from PiFinder import sys_utils_fake as sys_utils  # type: ignore[no-redef]
-from PiFinder import calc_utils
 from PiFinder import utils
+from PiFinder.ui.base import UIModule
 from PiFinder.ui.ui_utils import TextLayouter, SpaceCalculatorFixed
 
 
-class UIStatus(UIModule):
+class UISoftware(UIModule):
     """
-    Displays various status information
+    UI for updating software versions
     """
 
-    __title__ = "STATUS"
+    __title__ = "SOFTWARE"
 
-    _config_options = {
-        "Key Brit": {
-            "type": "enum",
-            "value": "",
-            "options": ["+3", "+2", "+1", "0", "-1", "-2", "-3", "Off"],
-            "callback": "set_key_brightness",
-        },
-        "Sleep Tim": {
-            "type": "enum",
-            "value": "",
-            "options": ["Off", "10s", "30s", "1m"],
-            "callback": "set_sleep_timeout",
-        },
-        "Screen Off": {
-            "type": "enum",
-            "value": "",
-            "options": ["Off", "30s", "1m", "10m", "30m"],
-            "callback": "set_screen_off_timeout",
-        },
-        "Hint Time": {
-            "type": "enum",
-            "value": "2s",
-            "options": ["Off", "2s", "4s", "On"],
-            "callback": "set_hint_timeout",
-        },
-        "WiFi Mode": {
-            "type": "enum",
-            "value": "UNK",
-            "options": ["AP", "Client", "CANCEL"],
-            "callback": "wifi_switch",
-        },
-        "Mnt Side": {
-            "type": "enum",
-            "value": "",
-            "options": ["right", "left", "flat", "CANCEL"],
-            "callback": "side_switch",
-        },
-        "Mnt Type": {
-            "type": "enum",
-            "value": "",
-            "options": ["Alt/Az", "EQ", "CANCEL"],
-            "callback": "mount_switch",
-        },
-        "Shutdown": {
-            "type": "enum",
-            "value": "",
-            "options": ["System", "CANCEL"],
-            "callback": "shutdown",
-        },
-        "Software": {
-            "type": "enum",
-            "value": "",
-            "options": ["Update", "CANCEL"],
-            "callback": "update_software",
-        },
-    }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args):
+        super().__init__(*args)
         self.version_txt = f"{utils.pifinder_dir}/version.txt"
         self.wifi_txt = f"{utils.pifinder_dir}/wifi_status.txt"
         self._draw_pos = (0, self.display_class.titlebar_height)
@@ -135,7 +76,6 @@ class UIStatus(UIModule):
 
         self.last_temp_time = 0
         self.last_IP_time = 0
-        self.net = sys_utils.Network()
         self.text_layout = TextLayouter(
             "",
             draw=self.draw,
@@ -230,34 +170,6 @@ class UIStatus(UIModule):
             self._config_options["Restart"]["value"] = ""
             return False
 
-    def update_status_dict(self):
-        """
-        Updates all the
-        status dict values
-        """
-        if self.shared_state.solve_state():
-            solution = self.shared_state.solution()
-            # last solve time
-            if solution["solve_source"] == "CAM":
-                stars_matched = solution["Matches"]
-            else:
-                stars_matched = "--"
-            self.status_dict["LST SLV"] = (
-                f"{time.time() - solution['cam_solve_time']:.1f}"
-                + " - "
-                + str(solution["solve_source"][0])
-                + f" {stars_matched: >2}"
-            )
-            hh, mm, _ = calc_utils.ra_to_hms(solution["RA"])
-            self.status_dict["RA/DEC"] = (
-                f"{hh:02.0f}h{mm:02.0f}m/{solution['Dec'] :.2f}"
-            )
-
-            if solution["Az"]:
-                self.status_dict["AZ/ALT"] = (
-                    f"{solution['Az'] : >6.2f}/{solution['Alt'] : >6.2f}"
-                )
-
         imu = self.shared_state.imu()
         if imu:
             if imu["pos"] is not None:
@@ -285,17 +197,6 @@ class UIStatus(UIModule):
         if dt:
             self.status_dict["LCL TM"] = local_dt.time().isoformat()[:8]
             self.status_dict["UTC TM"] = dt.time().isoformat()[:8]
-
-        # only update some things periodically....
-        if time.time() - self.last_temp_time > 5:
-            # temp
-            self.last_temp_time = time.time()
-            try:
-                with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
-                    raw_temp = int(f.read().strip())
-                self.status_dict["CPU TMP"] = f"{raw_temp / 1000 : >13.1f}"
-            except FileNotFoundError:
-                self.status_dict["CPU TMP"] = "Error"
 
         if time.time() - self.last_IP_time > 20:
             self.last_IP_time = time.time()
