@@ -73,6 +73,66 @@ def set_exposure(ui_module: UIModule) -> None:
     logger.info("Set exposure %f", new_exposure)
     ui_module.command_queues["camera"].put(f"set_exp:{new_exposure}")
 
+def set_auto_exposure_zero_star_handler(ui_module: UIModule) -> None:
+    """
+    Sets the zero-star handler plugin for auto-exposure.
+    Supports:
+      - "sweep": Systematic doubling sweep (25ms→1s, 2× ratio)
+      - "exponential": Logarithmic sweep (25ms→1s, 1.85× ratio, 7 steps)
+      - "reset": Quick reset to 0.4s default
+      - "histogram": Histogram-based adaptive with viable exposure selection
+    """
+    handler_type = ui_module.config_object.get_option("auto_exposure_zero_star_handler")
+    logger.info("Set auto-exposure zero-star handler to: %s", handler_type)
+    ui_module.command_queues["camera"].put(f"set_ae_handler:{handler_type}")
+
+
+def capture_exposure_sweep(ui_module: UIModule) -> None:
+    """
+    Captures 100 images at different exposures for PID testing/calibration.
+
+    Uses logarithmic spacing from 25ms to 1s for fine-grained analysis.
+    Images saved to: ~/PiFinder_data/captures/sweep_YYYYMMDD_HHMMSS/
+    Takes approximately 20 seconds to complete.
+    """
+    logger.info("Starting exposure sweep capture")
+    ui_module.command_queues["camera"].put("capture_exp_sweep")
+    ui_module.message(_("Capturing\nExp Sweep...\n~20 sec"), 3)
+    ui_module.remove_from_stack()
+
+
+def get_camera_exposure_display(ui_module: UIModule) -> str:
+    """
+    Returns formatted current camera exposure for display.
+    Used to show current value when in auto-exposure mode.
+    """
+    config_exp = ui_module.config_object.get_option("camera_exp")
+
+    # For auto mode, get actual exposure from metadata
+    if config_exp == "auto":
+        try:
+            metadata = ui_module.shared_state.last_image_metadata()
+            if metadata and "exposure_time" in metadata:
+                actual_exp = metadata["exposure_time"]
+                exp_sec = actual_exp / 1_000_000
+                if exp_sec < 0.1:
+                    return f" ({int(exp_sec * 1000)}ms)"
+                else:
+                    return f" ({exp_sec:g}s)"
+        except Exception:
+            pass
+        return ""
+
+    # Format numeric exposure nicely for manual mode
+    if isinstance(config_exp, (int, float)):
+        exp_sec = config_exp / 1_000_000
+        if exp_sec < 0.1:
+            return f" ({int(exp_sec * 1000)}ms)"
+        else:
+            return f" ({exp_sec:g}s)"
+
+    return ""
+
 
 def shutdown(ui_module: UIModule) -> None:
     """
@@ -317,3 +377,28 @@ def generate_custom_object_name(ui_module: UIModule) -> str:
 
     # Return next available number
     return f"CUSTOM {max_num + 1}"
+
+def get_mountcontrol_status(ui_module: UIModule) -> list[str]:
+    """
+    Returns the current status of the mount control service
+    """
+    status_str = "mountcontrol_off"
+    if sys_utils.is_mountcontrol_active():
+         status_str = "mountcontrol_on"
+    return [status_str]
+
+def mountcontrol_activate(ui_module: UIModule) -> None:
+    """
+    Activates the mount control service
+    """
+    ui_module.message(_("Activating\nMount Control"), 2)
+    sys_utils.mountcontrol_activate()
+    restart_system(ui_module)
+
+def mountcontrol_deactivate(ui_module: UIModule) -> None:
+    """
+    Deactivates the mount control service
+    """
+    ui_module.message(_("Deactivating\nMount Control"), 2)
+    sys_utils.mountcontrol_deactivate()
+    restart_system(ui_module)

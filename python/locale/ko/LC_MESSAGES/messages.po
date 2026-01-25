@@ -1,0 +1,1565 @@
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# Phil Lee <info@ezt-astro.com>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.1\n"
+"Report-Msgid-Bugs-To: info@ezt-astro.com\n"
+"POT-Creation-Date: 2025-11-12 23:20+0900\n"
+"PO-Revision-Date: 2025-11-12 23:20+0900\n"
+"Last-Translator: Phil Lee <eztastro@gmail.com>\n"
+"Language: ko_KR\n"
+"Language-Team: ko_KR <phil@ezt-astro.com>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: PiFinder/cat_images.py:43
+msgid "No Image"
+msgstr "이미지없음"
+
+#: PiFinder/obj_types.py:7 PiFinder/ui/menu_structure.py:362
+msgid "Galaxy"
+msgstr "은하"
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:8 PiFinder/ui/menu_structure.py:366
+msgid "Open Cluster"
+msgstr "산개성단"
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:9 PiFinder/ui/menu_structure.py:374
+msgid "Globular"
+msgstr "구상성단"
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:10 PiFinder/ui/menu_structure.py:378
+msgid "Nebula"
+msgstr "성운"
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:11 PiFinder/ui/menu_structure.py:386
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:12
+
+msgid "Planetary"
+msgstr "행성상"
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:13
+
+msgid "Cluster + Neb"
+msgstr "성단+성운"
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:14 PiFinder/ui/menu_structure.py:406
+msgid "Asterism"
+msgstr "성군"
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:15 PiFinder/ui/menu_structure.py:402
+msgid "Knot"
+msgstr "혜성모양의 점"
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:16
+
+msgid "Triple star"
+msgstr "삼중성"
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:17
+
+msgid "Double star"
+msgstr "이중성"
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:18 PiFinder/ui/menu_structure.py:390
+
+msgid "Star"
+msgstr "항성"
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:19
+msgid "Unkn"
+msgstr "알수없음"
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:20 PiFinder/ui/menu_structure.py:410
+msgid "Planet"
+msgstr "행성"
+
+#. TRANSLATORS: Object type
+#: PiFinder/obj_types.py:21 PiFinder/ui/menu_structure.py:414
+
+msgid "Comet"
+msgstr "혜성"
+
+#: PiFinder/ui/align.py:56
+msgid "Align Timeout"
+msgstr "시간초과"
+
+#: PiFinder/ui/align.py:74
+msgid "Alignment Set"
+msgstr "정렬완료"
+
+#: PiFinder/ui/align.py:272 PiFinder/ui/chart.py:210
+msgid "Can't plot"
+msgstr "투영할 수 없음"
+
+#: PiFinder/ui/align.py:284 PiFinder/ui/chart.py:222 PiFinder/ui/log.py:174
+#: PiFinder/ui/object_list.py:206 PiFinder/ui/object_list.py:226
+msgid "No Solve Yet"
+msgstr "솔빙 완료 전"
+
+#: PiFinder/ui/align.py:397 PiFinder/ui/object_details.py:461
+
+msgid "Aligning..."
+msgstr "정렬중..."
+
+#: PiFinder/ui/align.py:405 PiFinder/ui/object_details.py:469
+
+msgid "Aligned!"
+msgstr "정렬됨"
+
+#: PiFinder/ui/align.py:407
+msgid "Alignment failed"
+msgstr "정렬실패"
+
+#: PiFinder/ui/callbacks.py:50
+msgid "Filters Reset"
+msgstr "조건해제"
+
+#: PiFinder/ui/callbacks.py:63 PiFinder/ui/menu_structure.py:949
+
+msgid "Test Mode"
+msgstr "테스트모드"
+
+#: PiFinder/ui/callbacks.py:79
+msgid "종료중"
+msgstr "Arrêt"
+
+#: PiFinder/ui/callbacks.py:88 PiFinder/ui/callbacks.py:96
+msgid "Restarting..."
+msgstr "재시작중.."
+
+#: PiFinder/ui/callbacks.py:101 PiFinder/ui/callbacks.py:107
+#: PiFinder/ui/callbacks.py:113
+msgid "Switching cam"
+msgstr "캠 전환"
+
+#: PiFinder/ui/callbacks.py:148
+msgid "WiFi to AP"
+msgstr "AP 모드로"
+
+#: PiFinder/ui/callbacks.py:154
+msgid "WiFi to Client"
+msgstr "클라이언트 모드로"
+
+#: PiFinder/ui/callbacks.py:193
+msgid "Time: {time}"
+msgstr "시간: {time}"
+
+#: PiFinder/ui/chart.py:40 PiFinder/ui/menu_structure.py:526
+msgid "Settings"
+msgstr "설정"
+
+#: PiFinder/ui/equipment.py:35
+msgid "No telescope selected"
+msgstr "망원경이 선택되지 않음"
+
+#: PiFinder/ui/equipment.py:50
+msgid "No eyepiece selected"
+msgstr "아이피스 선택되지 않음"
+
+#: PiFinder/ui/equipment.py:70
+msgid "Mag: {mag:.0f}x"
+msgstr "등급: {mag:.0f}x"
+
+#: PiFinder/ui/equipment.py:82
+msgid "TFOV: {tfov_degrees:.0f}°{tfov_minutes:02.0f}'"
+msgstr "화각: {tfov_degrees:.0f}°{tfov_minutes:02.0f}'"
+
+#: PiFinder/ui/equipment.py:95
+msgid "Telescope..."
+msgstr "망원경..."
+
+#: PiFinder/ui/equipment.py:106 PiFinder/ui/log.py:231
+msgid "Eyepiece..."
+msgstr "아이피스"
+
+#: PiFinder/ui/gpsstatus.py:31
+msgid "Limited"
+msgstr "제한됨"
+
+#. TRANSLATORS: there's no GPS lock but we accept the position due to low
+#. enough error value
+#: PiFinder/ui/gpsstatus.py:34
+msgid "Basic"
+msgstr "기본"
+
+#. TRANSLATORS: coarse GPS fix, does this happen?
+#: PiFinder/ui/gpsstatus.py:35
+msgid "Accurate"
+msgstr "정확"
+
+#. TRANSLATORS: GPS 2D Fix
+#: PiFinder/ui/gpsstatus.py:36
+
+msgid "Precise"
+msgstr "매우정확"
+
+#: PiFinder/ui/gpsstatus.py:46
+
+msgid "Save"
+msgstr "저장"
+
+#: PiFinder/ui/gpsstatus.py:49
+msgid "Lock"
+msgstr "연결"
+
+#: PiFinder/ui/gpsstatus.py:80
+
+msgid "Location Name"
+msgstr "지역명"
+
+#: PiFinder/ui/gpsstatus.py:83
+msgid "Loc {number}"
+msgstr "지역 {number}"
+
+#: PiFinder/ui/gpsstatus.py:113
+
+msgid "Location saved"
+msgstr "위치 저장"
+
+#: PiFinder/ui/gpsstatus.py:123
+msgid "Location locked"
+msgstr "위치 고정됨"
+
+#: PiFinder/ui/gpsstatus.py:128
+msgid "{error:.1f} km"
+msgstr "{error:.1f} km"
+
+#: PiFinder/ui/gpsstatus.py:132
+msgid "{error:.0f} m"
+msgstr "{error:.0f} m"
+
+#: PiFinder/ui/gpsstatus.py:155
+msgid "GPS Locked"
+msgstr "GPS 연결됨"
+
+#: PiFinder/ui/gpsstatus.py:162
+msgid "Lock boost on"
+msgstr "성능을 향상중"
+
+#: PiFinder/ui/gpsstatus.py:171
+msgid "You are ready"
+msgstr "준비됨.."
+
+#: PiFinder/ui/gpsstatus.py:178
+
+msgid "to observe!"
+msgstr "관측"
+
+#: PiFinder/ui/gpsstatus.py:186
+msgid "Stay on this screen"
+msgstr "현재 화면을 켜두세요"
+
+#: PiFinder/ui/gpsstatus.py:195
+msgid "신속한 설정을 위해"
+msgstr ""
+
+#: PiFinder/ui/gpsstatus.py:206
+
+msgid "Lock Type:"
+msgstr "연결 타입"
+
+#: PiFinder/ui/gpsstatus.py:213 PiFinder/ui/menu_structure.py:426
+#: PiFinder/ui/menu_structure.py:458
+msgid "None"
+msgstr "없음"
+
+#: PiFinder/ui/gpsstatus.py:226
+msgid "Sats seen/used:"
+msgstr "위성 보임/사용됨:"
+
+#: PiFinder/ui/gpsstatus.py:242
+msgid "{square} Toggle Details"
+msgstr "{square} 상세내역"
+
+#: PiFinder/ui/gpsstatus.py:251
+msgid "Sats seen/used: {sats_seen}/{sats_used}"
+msgstr "위성 보임/사용됨: {sats_seen}/{sats_used}"
+
+#: PiFinder/ui/gpsstatus.py:262
+msgid "Error: {error}"
+msgstr "오류: {error}"
+
+#: PiFinder/ui/gpsstatus.py:273
+msgid "Lock:  {locktype}"
+msgstr "연결:  {locktype}"
+
+#: PiFinder/ui/gpsstatus.py:274
+
+msgid "No"
+msgstr "없음"
+
+#: PiFinder/ui/gpsstatus.py:286
+msgid "Lat:   {latitude:.5f}"
+msgstr "위도:   {latitude:.5f}"
+
+#: PiFinder/ui/gpsstatus.py:294
+msgid "Lon:   {longitude:.5f}"
+msgstr "경도:   {longitude:.5f}"
+
+#: PiFinder/ui/gpsstatus.py:302
+msgid "Alt:   {altitude:.1f} m"
+msgstr "고도:   {altitude:.1f} m"
+
+#: PiFinder/ui/gpsstatus.py:311
+msgid "Time:  {time}"
+msgstr "시간:  {time}"
+
+#: PiFinder/ui/gpsstatus.py:320
+msgid "From:  {location_source}"
+msgstr "소스:  {location_source}"
+
+#: PiFinder/ui/log.py:58
+
+msgid "Conditions"
+msgstr "조건"
+
+#: PiFinder/ui/log.py:63
+msgid "Transparency"
+msgstr "투명도"
+
+#. TRANSLATORS: Transparency not available
+#. TRANSLATORS: Seeing not available
+#. TRANSLATORS: eyepiece info not available
+#: PiFinder/ui/log.py:70 PiFinder/ui/log.py:103 PiFinder/ui/log.py:261
+msgid "NA"
+msgstr "없음"
+
+#: PiFinder/ui/log.py:74 PiFinder/ui/log.py:107
+
+msgid "Excellent"
+msgstr "최상"
+
+#: PiFinder/ui/log.py:78 PiFinder/ui/log.py:111
+msgid "Very Good"
+msgstr "매우좋음"
+
+#: PiFinder/ui/log.py:82 PiFinder/ui/log.py:115
+msgid "Good"
+msgstr "좋음"
+
+#: PiFinder/ui/log.py:86 PiFinder/ui/log.py:119
+
+msgid "Fair"
+msgstr "적당함"
+
+#: PiFinder/ui/log.py:90 PiFinder/ui/log.py:123
+
+msgid "Poor"
+msgstr "나쁨"
+
+#: PiFinder/ui/log.py:96
+
+msgid "Seeing"
+msgstr "시잉"
+
+#: PiFinder/ui/log.py:185
+msgid "SAVE Log"
+msgstr "로그 저장"
+
+#: PiFinder/ui/log.py:196
+msgid "Observability"
+msgstr "관측"
+
+#: PiFinder/ui/log.py:209
+msgid "Appeal"
+msgstr "Appel"
+
+#: PiFinder/ui/log.py:221
+msgid "Conditions..."
+msgstr "조건들..."
+
+#: PiFinder/ui/log.py:304
+
+msgid "Logged!"
+msgstr "접속됨"
+
+#: PiFinder/ui/menu_manager.py:77
+
+msgid "Eyepiece"
+msgstr "아이피스"
+
+#: PiFinder/ui/menu_manager.py:96
+
+msgid "Telescope"
+msgstr "망원경"
+
+#: PiFinder/ui/menu_structure.py:23
+
+msgid "Language: de"
+msgstr "언어: 독일어"
+
+#: PiFinder/ui/menu_structure.py:24
+
+msgid "Language: en"
+msgstr "언어: 영어"
+
+#: PiFinder/ui/menu_structure.py:25
+
+msgid "Language: es"
+msgstr "언어: 스페인어"
+
+#: PiFinder/ui/menu_structure.py:26
+
+msgid "Language: fr"
+msgstr "언어: 프랑스어"
+
+#: PiFinder/ui/menu_structure.py:37
+msgid "Start"
+msgstr "시작"
+
+#: PiFinder/ui/menu_structure.py:42
+msgid "Focus"
+msgstr "초점조절"
+
+#: PiFinder/ui/menu_structure.py:46
+msgid "Align"
+msgstr "정렬"
+
+#: PiFinder/ui/menu_structure.py:52 PiFinder/ui/menu_structure.py:932
+msgid "GPS Status"
+msgstr "GPS상태"
+
+#: PiFinder/ui/menu_structure.py:58
+msgid "Chart"
+msgstr "차트"
+
+#: PiFinder/ui/menu_structure.py:64
+msgid "Objects"
+msgstr "대상"
+
+#: PiFinder/ui/menu_structure.py:69
+msgid "All Filtered"
+msgstr "모두선택됨"
+
+#: PiFinder/ui/menu_structure.py:74
+msgid "By Catalog"
+msgstr "카탈로그"
+
+#: PiFinder/ui/menu_structure.py:79 PiFinder/ui/menu_structure.py:254
+msgid "Planets"
+msgstr "행성"
+
+#: PiFinder/ui/menu_structure.py:85 PiFinder/ui/menu_structure.py:156
+#: PiFinder/ui/menu_structure.py:258 PiFinder/ui/menu_structure.py:308
+msgid "NGC"
+msgstr "NGC"
+
+#: PiFinder/ui/menu_structure.py:91 PiFinder/ui/menu_structure.py:150
+#: PiFinder/ui/menu_structure.py:262 PiFinder/ui/menu_structure.py:304
+msgid "Messier"
+msgstr "메시에"
+
+#: PiFinder/ui/menu_structure.py:97 PiFinder/ui/menu_structure.py:266
+msgid "DSO..."
+msgstr "DSO..."
+
+#: PiFinder/ui/menu_structure.py:102 PiFinder/ui/menu_structure.py:272
+msgid "Abell Pn"
+msgstr "Abell Pn"
+
+#: PiFinder/ui/menu_structure.py:108 PiFinder/ui/menu_structure.py:276
+msgid "Arp Galaxies"
+msgstr "Arp Galaxies"
+
+#: PiFinder/ui/menu_structure.py:114 PiFinder/ui/menu_structure.py:280
+msgid "Barnard"
+msgstr "Barnard"
+
+#: PiFinder/ui/menu_structure.py:120 PiFinder/ui/menu_structure.py:284
+msgid "Caldwell"
+msgstr "Caldwell"
+
+#: PiFinder/ui/menu_structure.py:126 PiFinder/ui/menu_structure.py:288
+msgid "Collinder"
+msgstr "Collinder"
+
+#: PiFinder/ui/menu_structure.py:132 PiFinder/ui/menu_structure.py:292
+msgid "E.G. Globs"
+msgstr "E.G. Globs"
+
+#: PiFinder/ui/menu_structure.py:138 PiFinder/ui/menu_structure.py:296
+msgid "Herschel 400"
+msgstr "Herschel 400"
+
+#: PiFinder/ui/menu_structure.py:144 PiFinder/ui/menu_structure.py:300
+msgid "IC"
+msgstr "IC"
+
+#: PiFinder/ui/menu_structure.py:162 PiFinder/ui/menu_structure.py:312
+msgid "Sharpless"
+msgstr "Sharpless"
+
+#: PiFinder/ui/menu_structure.py:168 PiFinder/ui/menu_structure.py:316
+msgid "TAAS 200"
+msgstr "TAAS 200"
+
+#: PiFinder/ui/menu_structure.py:176 PiFinder/ui/menu_structure.py:322
+msgid "Stars..."
+msgstr "항성..."
+
+#: PiFinder/ui/menu_structure.py:181 PiFinder/ui/menu_structure.py:328
+msgid "Bright Named"
+msgstr "이름"
+
+#: PiFinder/ui/menu_structure.py:187 PiFinder/ui/menu_structure.py:332
+msgid "SAC Doubles"
+msgstr "SAC이중성"
+
+#: PiFinder/ui/menu_structure.py:193 PiFinder/ui/menu_structure.py:336
+msgid "SAC Asterisms"
+msgstr "SAC성군"
+
+#: PiFinder/ui/menu_structure.py:199 PiFinder/ui/menu_structure.py:340
+msgid "SAC Red Stars"
+msgstr "SAC적색별"
+
+#: PiFinder/ui/menu_structure.py:205 PiFinder/ui/menu_structure.py:344
+msgid "RASC Doubles"
+msgstr "RASC이중성"
+
+#: PiFinder/ui/menu_structure.py:211 PiFinder/ui/menu_structure.py:348
+msgid "TLK 90 Variables"
+msgstr "TLK 90 변광성"
+
+#: PiFinder/ui/menu_structure.py:221
+msgid "Recent"
+msgstr "최근"
+
+msgid "Custom"
+msgstr "맞춤검색"
+
+#: PiFinder/ui/menu_structure.py:227
+msgid "Name Search"
+msgstr "이름검색"
+
+#: PiFinder/ui/menu_structure.py:233 PiFinder/ui/object_list.py:136
+msgid "Filter"
+msgstr "검색"
+
+#: PiFinder/ui/menu_structure.py:239
+msgid "Reset All"
+msgstr "재설정"
+
+#: PiFinder/ui/menu_structure.py:243 PiFinder/ui/menu_structure.py:973
+msgid "Confirm"
+msgstr "확인"
+
+#: PiFinder/ui/menu_structure.py:244 PiFinder/ui/menu_structure.py:976
+#: PiFinder/ui/software.py:204
+msgid "Cancel"
+msgstr "취소"
+
+#: PiFinder/ui/menu_structure.py:248
+msgid "Catalogs"
+msgstr "카탈로그"
+
+#: PiFinder/ui/menu_structure.py:356
+msgid "Type"
+msgstr "형식"
+
+#: PiFinder/ui/menu_structure.py:370
+msgid "Cluster/Neb"
+msgstr "성단/성운"
+
+#: PiFinder/ui/menu_structure.py:382
+msgid "P. Nebula"
+msgstr "행성상성운"
+
+#: PiFinder/ui/menu_structure.py:394
+msgid "Double Str"
+msgstr "이중성"
+
+#: PiFinder/ui/menu_structure.py:398
+
+msgid "Triple Str"
+msgstr "삼중성"
+
+#: PiFinder/ui/menu_structure.py:420
+msgid "Altitude"
+msgstr "고도"
+
+#: PiFinder/ui/menu_structure.py:452
+msgid "Magnitude"
+msgstr "등급"
+
+#: PiFinder/ui/menu_structure.py:504 PiFinder/ui/menu_structure.py:514
+msgid "Observed"
+msgstr "관측한 대상"
+
+#: PiFinder/ui/menu_structure.py:510
+msgid "Any"
+msgstr "아무거나"
+
+#: PiFinder/ui/menu_structure.py:518
+msgid "Not Observed"
+msgstr "관측되지 않은 대상"
+
+#: PiFinder/ui/menu_structure.py:531
+msgid "User Pref..."
+msgstr "개인설정..."
+
+#: PiFinder/ui/menu_structure.py:536
+msgid "Key Bright"
+msgstr "키 밝기"
+
+#: PiFinder/ui/menu_structure.py:576
+msgid "Sleep Time"
+msgstr "절전모드"
+
+#: PiFinder/ui/menu_structure.py:582 PiFinder/ui/menu_structure.py:614
+#: PiFinder/ui/menu_structure.py:638 PiFinder/ui/menu_structure.py:687
+#: PiFinder/ui/menu_structure.py:711 PiFinder/ui/menu_structure.py:735
+#: PiFinder/ui/menu_structure.py:759 PiFinder/ui/preview.py:62
+#: PiFinder/ui/preview.py:79
+msgid "Off"
+msgstr "끄기"
+
+#: PiFinder/ui/menu_structure.py:608
+msgid "Menu Anim"
+msgstr "메뉴전환속도"
+
+#: PiFinder/ui/menu_structure.py:618 PiFinder/ui/menu_structure.py:642
+msgid "Fast"
+msgstr "빠름"
+
+#: PiFinder/ui/menu_structure.py:622 PiFinder/ui/menu_structure.py:646
+#: PiFinder/ui/menu_structure.py:695 PiFinder/ui/menu_structure.py:719
+#: PiFinder/ui/menu_structure.py:743 PiFinder/ui/preview.py:67
+msgid "Medium"
+msgstr "중간"
+
+#: PiFinder/ui/menu_structure.py:626 PiFinder/ui/menu_structure.py:650
+msgid "Slow"
+msgstr "느림"
+
+#: PiFinder/ui/menu_structure.py:632
+msgid "Scroll Speed"
+msgstr "스크롤속도"
+
+#: PiFinder/ui/menu_structure.py:656
+msgid "Az Arrows"
+msgstr "방위각화살표"
+
+#: PiFinder/ui/menu_structure.py:663
+msgid "Default"
+msgstr "기본"
+
+#: PiFinder/ui/menu_structure.py:667
+msgid "Reverse"
+msgstr "역방향"
+
+#: PiFinder/ui/menu_structure.py:675
+msgid "Chart..."
+msgstr "차트..."
+
+#: PiFinder/ui/menu_structure.py:681
+msgid "Reticle"
+msgstr "십자선"
+
+#: PiFinder/ui/menu_structure.py:691 PiFinder/ui/menu_structure.py:715
+#: PiFinder/ui/menu_structure.py:739 PiFinder/ui/preview.py:72
+msgid "Low"
+msgstr "낮은"
+
+#: PiFinder/ui/menu_structure.py:699 PiFinder/ui/menu_structure.py:723
+#: PiFinder/ui/menu_structure.py:747 PiFinder/ui/preview.py:64
+msgid "High"
+msgstr "높은"
+
+#: PiFinder/ui/menu_structure.py:705
+msgid "Constellation"
+msgstr "별자리"
+
+#: PiFinder/ui/menu_structure.py:729
+msgid "DSO Display"
+msgstr "DSO표시"
+
+#: PiFinder/ui/menu_structure.py:753
+msgid "RA/DEC Disp."
+msgstr "AD/DEC표시"
+
+#: PiFinder/ui/menu_structure.py:763
+msgid "HH:MM"
+msgstr "HH:MM"
+
+#: PiFinder/ui/menu_structure.py:767
+msgid "Degrees"
+msgstr "각도"
+
+#: PiFinder/ui/menu_structure.py:775
+msgid "Camera Exp"
+msgstr "카메라노출"
+
+#: PiFinder/ui/menu_structure.py:783
+msgid "0.025s"
+msgstr "0.025s"
+
+#: PiFinder/ui/menu_structure.py:787
+msgid "0.05s"
+msgstr "0.05s"
+
+#: PiFinder/ui/menu_structure.py:791
+msgid "0.1s"
+msgstr "0.1s"
+
+#: PiFinder/ui/menu_structure.py:795
+msgid "0.2s"
+msgstr "0.2s"
+
+#: PiFinder/ui/menu_structure.py:799
+msgid "0.4s"
+msgstr "0.4s"
+
+#: PiFinder/ui/menu_structure.py:803
+msgid "0.8s"
+msgstr "0.8s"
+
+#: PiFinder/ui/menu_structure.py:807
+msgid "1s"
+msgstr "1s"
+
+#: PiFinder/ui/menu_structure.py:813
+msgid "WiFi Mode"
+msgstr "와이파이"
+
+#: PiFinder/ui/menu_structure.py:819
+
+msgid "Client Mode"
+msgstr "클라이언트모드"
+
+#: PiFinder/ui/menu_structure.py:824
+
+msgid "AP Mode"
+msgstr "AP 모드"
+
+#: PiFinder/ui/menu_structure.py:831
+msgid "PiFinder Type"
+msgstr "PiFinder형식"
+
+#: PiFinder/ui/menu_structure.py:838
+msgid "Left"
+msgstr "좌측"
+
+#: PiFinder/ui/menu_structure.py:842
+msgid "Right"
+msgstr "우측"
+
+#: PiFinder/ui/menu_structure.py:846
+msgid "Straight"
+msgstr "직선"
+
+#: PiFinder/ui/menu_structure.py:850
+msgid "Flat v3"
+msgstr "플랫 v3"
+
+#: PiFinder/ui/menu_structure.py:854
+msgid "Flat v2"
+msgstr "플랫 v2"
+
+#: PiFinder/ui/menu_structure.py:860
+msgid "Mount Type"
+msgstr "마운트형태"
+
+#: PiFinder/ui/menu_structure.py:867
+msgid "Alt/Az"
+msgstr "경위대식"
+
+#: PiFinder/ui/menu_structure.py:871
+msgid "Equitorial"
+msgstr "적도의식"
+
+#: PiFinder/ui/menu_structure.py:877
+msgid "Camera Type"
+msgstr "카메라종류"
+
+#: PiFinder/ui/menu_structure.py:883
+msgid "v2 - imx477"
+msgstr "v2 - imx477"
+
+#: PiFinder/ui/menu_structure.py:888
+msgid "v3 - imx296"
+msgstr "v3 - imx296"
+
+#: PiFinder/ui/menu_structure.py:893
+
+msgid "v3 - imx462"
+msgstr "v3 - imx462"
+
+#: PiFinder/ui/menu_structure.py:900
+
+msgid "GPS Type"
+msgstr "GPS종류"
+
+#: PiFinder/ui/menu_structure.py:908
+msgid "UBlox"
+msgstr "UBlox"
+
+#: PiFinder/ui/menu_structure.py:912
+msgid "GPSD (generic)"
+msgstr "GPSD (일반)"
+
+#: PiFinder/ui/menu_structure.py:920
+msgid "Tools"
+msgstr "도구"
+
+#: PiFinder/ui/menu_structure.py:924
+
+msgid "Status"
+msgstr "상태"
+
+#: PiFinder/ui/menu_structure.py:925
+msgid "Equipment"
+msgstr "장비"
+
+#: PiFinder/ui/menu_structure.py:927
+
+msgid "Place & Time"
+msgstr "장소&시간"
+
+#: PiFinder/ui/menu_structure.py:936
+
+msgid "Set Location"
+msgstr "위치설정"
+
+#: PiFinder/ui/menu_structure.py:940
+
+msgid "Set Time"
+msgstr "시간설정"
+
+#: PiFinder/ui/menu_structure.py:944
+
+msgid "Reset"
+msgstr "원래대로"
+
+#: PiFinder/ui/menu_structure.py:947
+msgid "Console"
+msgstr "콘솔"
+
+#: PiFinder/ui/menu_structure.py:948
+msgid "Software Upd"
+msgstr "SW업데이트"
+
+#: PiFinder/ui/menu_structure.py:951
+msgid "Power"
+msgstr "전원"
+
+#: PiFinder/ui/menu_structure.py:957
+msgid "Shutdown"
+msgstr "종료"
+
+msgid "Shutting Down"
+msgstr "종료중"
+
+#: PiFinder/ui/menu_structure.py:967
+msgid "Restart"
+msgstr "재시작"
+
+#: PiFinder/ui/menu_structure.py:982
+msgid "Experimental"
+msgstr "실험"
+
+#: PiFinder/ui/menu_structure.py:987
+
+msgid "Language"
+msgstr "Langage"
+
+#: PiFinder/ui/menu_structure.py:994
+
+msgid "English"
+msgstr "English"
+
+#: PiFinder/ui/menu_structure.py:998
+
+msgid "German"
+msgstr "German"
+
+#: PiFinder/ui/menu_structure.py:1002
+
+msgid "French"
+msgstr "French"
+
+#: PiFinder/ui/menu_structure.py:1006
+
+msgid "Spanish"
+msgstr "Spanish"
+
+#: PiFinder/ui/menu_structure.py:1006
+
+msgid "Korean"
+msgstr "한국어"
+
+#: PiFinder/ui/object_details.py:61 PiFinder/ui/object_details.py:66
+
+msgid "ALIGN"
+msgstr "정렬"
+
+#: PiFinder/ui/object_details.py:64
+
+msgid "CANCEL"
+msgstr "취소"
+
+#: PiFinder/ui/object_details.py:96
+
+msgid "No Object Found"
+msgstr "검색된 대상 없음"
+
+#: PiFinder/ui/object_details.py:175 PiFinder/ui/object_details.py:183
+msgid "Mag:{obj_mag}"
+msgstr "등급:{obj_mag}"
+
+#. TRANSLATORS: object info magnitude
+#: PiFinder/ui/object_details.py:178
+msgid "Sz:{size}"
+msgstr "크기:{size}"
+
+#: PiFinder/ui/object_details.py:207
+
+msgid "  Not Logged"
+msgstr "Connecté"
+
+#: PiFinder/ui/object_details.py:209
+msgid "  {logs} Logs"
+msgstr ""
+
+#: PiFinder/ui/object_details.py:244
+
+msgid "No solve"
+msgstr "솔빙 되지 않음"
+
+#: PiFinder/ui/object_details.py:250
+msgid "yet{elipsis}"
+msgstr ""
+
+#: PiFinder/ui/object_details.py:264
+
+msgid "Searching"
+msgstr "검색중"
+
+#: PiFinder/ui/object_details.py:270
+msgid "for GPS{elipsis}"
+msgstr ""
+
+#: PiFinder/ui/object_details.py:284
+msgid "Calculating"
+msgstr "계산중"
+
+#: PiFinder/ui/object_details.py:471
+msgid "Too Far"
+msgstr "너무 멈"
+
+#: PiFinder/ui/object_details.py:496
+
+msgid "LOG"
+msgstr "로그"
+
+#: PiFinder/ui/object_list.py:123
+
+msgid "Sort"
+msgstr "정렬"
+
+#: PiFinder/ui/object_list.py:127 PiFinder/ui/object_list.py:667
+
+msgid "Nearest"
+msgstr "가까운"
+
+#: PiFinder/ui/object_list.py:131 PiFinder/ui/object_list.py:673
+
+msgid "Standard"
+msgstr "표준"
+
+#: PiFinder/ui/object_list.py:193
+msgid ""
+"Sorting by\n"
+"{sort_order}"
+msgstr ""
+"{sort_order}\n"
+"정렬중"
+
+#: PiFinder/ui/object_list.py:194 PiFinder/ui/object_list.py:678
+msgid "RA"
+msgstr "적경"
+
+msgid "DEC"
+msgstr "적위"
+
+#: PiFinder/ui/object_list.py:196 PiFinder/ui/object_list.py:445
+
+msgid "Catalog"
+msgstr "카탈로그"
+
+#: PiFinder/ui/object_list.py:198 PiFinder/ui/object_list.py:447
+msgid "Nearby"
+msgstr "근처"
+
+#: PiFinder/ui/object_list.py:409
+
+msgid "No objects"
+msgstr "대상 없음"
+
+#: PiFinder/ui/object_list.py:415
+
+msgid "match filter"
+msgstr "검색 조건"
+
+#: PiFinder/ui/object_list.py:431
+msgid "{catalog_info_1} obj"
+msgstr "{catalog_info_1} 대상"
+
+#. TRANSLATORS: number of objects in object list
+#: PiFinder/ui/object_list.py:434
+msgid ", {catalog_info_2}d old"
+msgstr ""
+
+#: PiFinder/ui/object_list.py:444
+msgid "Sort: {sort_order}"
+msgstr "정렬: {sort_order}"
+
+#: PiFinder/ui/preview.py:56
+msgid "Exposure"
+msgstr "노출"
+
+#: PiFinder/ui/preview.py:60
+msgid "Gamma"
+msgstr "감마"
+
+#: PiFinder/ui/preview.py:77
+msgid "BG Sub"
+msgstr "배경제거"
+
+#: PiFinder/ui/preview.py:81
+msgid "Full"
+msgstr "전체"
+
+#: PiFinder/ui/preview.py:85
+msgid "Half"
+msgstr "절반"
+
+#: PiFinder/ui/preview.py:228
+msgid "Zoom x{zoom_number}"
+msgstr "확대 x{zoom_number}"
+
+#: PiFinder/ui/software.py:88
+
+msgid "Updating..."
+msgstr "업데이트중..."
+
+#: PiFinder/ui/software.py:90
+
+msgid "Ok! Restarting"
+msgstr "재시작중..."
+
+#: PiFinder/ui/software.py:93
+msgid "Error on Upd"
+msgstr "업데이트중 오류 발생"
+
+#: PiFinder/ui/software.py:101
+msgid "Wifi Mode: {wifi_mode}"
+msgstr "와이파이: {wifi_mode}"
+
+#: PiFinder/ui/software.py:109
+msgid "Current Version"
+msgstr "현재버전"
+
+#: PiFinder/ui/software.py:125
+msgid "Release Version"
+msgstr "배포버전"
+
+#: PiFinder/ui/software.py:141
+
+msgid "WiFi must be"
+msgstr "와이파이가 반드시"
+
+#: PiFinder/ui/software.py:147
+
+msgid "client mode"
+msgstr "클라이언트 모드"
+
+#: PiFinder/ui/software.py:160
+msgid "Checking for"
+msgstr "확인중"
+
+#: PiFinder/ui/software.py:166
+msgid "updates{elipsis}"
+msgstr ""
+
+#: PiFinder/ui/software.py:182
+msgid "No Update"
+msgstr "업데이트 없음"
+
+#: PiFinder/ui/software.py:188
+msgid "needed"
+msgstr "needed"
+
+#: PiFinder/ui/software.py:198
+msgid "Update Now"
+msgstr "지금 업데이트"
+
+#: PiFinder/ui/text_menu.py:60
+
+msgid "Select None"
+msgstr "선택 없음"
+
+#: PiFinder/ui/text_menu.py:221
+
+msgid "Select All"
+msgstr "전체 선택"
+
+#: PiFinder/ui/textentry.py:186
+
+msgid "Results"
+msgstr "결과"
+
+#: PiFinder/ui/textentry.py:292
+
+msgid "Enter Location Name:"
+msgstr "위치명 입력:"
+
+#: PiFinder/ui/textentry.py:300
+
+msgid "Search:"
+msgstr "검색:"
+
+#: PiFinder/ui/timeentry.py:15
+
+msgid "hh"
+msgstr ""
+
+#: PiFinder/ui/timeentry.py:16
+msgid "mm"
+msgstr ""
+
+#: PiFinder/ui/timeentry.py:17
+msgid "ss"
+msgstr ""
+
+#: PiFinder/ui/timeentry.py:97
+
+msgid "Enter Local Time"
+msgstr "시간 입력"
+
+#: PiFinder/ui/timeentry.py:117
+msgid "  Next box"
+msgstr "  다음 박스"
+
+#: PiFinder/ui/timeentry.py:124
+msgid "  Done"
+msgstr "  완료"
+
+#: PiFinder/ui/timeentry.py:131
+msgid "󰍴  Delete/Previous"
+msgstr "󰍴  삭제/이전"
+
+msgid "Language: Spanish"
+msgstr "언어: 스페인어"
+
+msgid "Debug: Activated"
+msgstr "디버그 : 활성화"
+
+msgid "Camera"
+msgstr "카메라"
+
+msgid "Comets"
+msgstr "혜성"
+
+msgid "yet{ellipsis}"
+msgstr ""
+
+msgid "for GPS{ellipsis}"
+msgstr ""
+
+msgid "Time: {0}"
+msgstr "시간: {0}"
+
+msgid "Mag:{obj_magn}"
+msgstr "등급:{obj_magn}"
+
+msgid "Sz:{sz}"
+msgstr "크기:{sz}"
+
+msgid "galaxy"
+msgstr "은하"
+
+msgid "oc"
+msgstr ""
+
+msgid "gc"
+msgstr "NGC"
+
+msgid "neb"
+msgstr "성운"
+
+msgid "pneb"
+msgstr "행성상성운"
+
+msgid "dstar"
+msgstr "이중성"
+
+msgid "ast"
+msgstr "성군"
+
+msgid "planet"
+msgstr "행성"
+
+msgid "설명"
+msgstr ""
+
+msgid "almost"
+msgstr "거의"
+
+msgid "among"
+msgstr ""
+
+msgid "고리 성운"
+msgstr ""
+
+msgid "attached"
+msgstr ""
+
+msgid "brighter"
+msgstr "더 밝은"
+
+msgid "between"
+msgstr ""
+
+msgid "binuclear"
+msgstr ""
+
+msgid "brightest to n side"
+msgstr ""
+
+msgid "brightest to s side"
+msgstr ""
+
+msgid "brightest to p side"
+msgstr ""
+
+msgid "brightest to f side"
+msgstr ""
+
+msgid "bright"
+msgstr ""
+
+msgid "considerably"
+msgstr ""
+
+msgid "chevelure"
+msgstr "A l'envers"
+
+msgid "coarse, coarsely"
+msgstr ""
+
+msgid "cometic (cometary form)"
+msgstr ""
+
+msgid "companion"
+msgstr ""
+
+msgid "connected"
+msgstr ""
+
+msgid "in contact"
+msgstr ""
+
+msgid "compressed"
+msgstr ""
+
+msgid "cluster"
+msgstr "성단"
+
+msgid "diameter"
+msgstr ""
+
+msgid "defined"
+msgstr ""
+
+msgid "diffused"
+msgstr ""
+
+msgid "difficult"
+msgstr ""
+
+msgid "distance, or distant"
+msgstr ""
+
+msgid "double"
+msgstr "이중성"
+
+msgid "extremely, excessively"
+msgstr ""
+
+msgid "most extremely"
+msgstr ""
+
+msgid "easily resolvable"
+msgstr ""
+
+msgid "excentric"
+msgstr ""
+
+msgid "extended"
+msgstr ""
+
+msgid "following (eastward)"
+msgstr ""
+
+msgid "faint"
+msgstr "Rapide"
+
+msgid "gradually"
+msgstr ""
+
+msgid "globular"
+msgstr "구상"
+
+msgid "group"
+msgstr ""
+
+msgid "irregular"
+msgstr ""
+
+msgid "irregular figure"
+msgstr ""
+
+msgid "involved, involving"
+msgstr ""
+
+msgid "little (adv.); long (adj.)"
+msgstr ""
+
+msgid "large"
+msgstr "큰"
+
+msgid "magnitude"
+msgstr "등급"
+
+msgid "middle, or in the middle"
+msgstr ""
+
+msgid "north"
+msgstr "북"
+
+msgid "Dark Nebula"
+msgstr "암흑성운"
+
+
+msgid "nebula"
+msgstr "성운"
+
+msgid "nebulous"
+msgstr "성운의"
+
+msgid "nebulosity"
+msgstr "성운기"
+
+msgid "north following"
+msgstr ""
+
+msgid "north preceding"
+msgstr ""
+
+msgid "north-south"
+msgstr ""
+
+msgid "near"
+msgstr "Récent"
+
+msgid "nucleus, or to a nucleus"
+msgstr ""
+
+msgid "preceding-following"
+msgstr ""
+
+msgid "pretty (adv., before F. B. L, S)"
+msgstr ""
+
+msgid "pretty gradually"
+msgstr ""
+
+msgid "pretty much"
+msgstr ""
+
+msgid "pretty suddenly"
+msgstr ""
+
+msgid "planetary nebula (same as PN)"
+msgstr ""
+
+msgid "probably"
+msgstr ""
+
+msgid "poor (sparse) in stars"
+msgstr ""
+
+msgid "planetary nebula"
+msgstr "행성상 성운"
+
+msgid "resolvable (mottled, not resolved)"
+msgstr ""
+
+msgid "partially resolved, some stars seen"
+msgstr ""
+
+msgid "well resolved, clearly consisting of stars"
+msgstr ""
+
+msgid "round"
+msgstr ""
+
+msgid "exactly round"
+msgstr ""
+
+msgid "rich in stars"
+msgstr "SAC Etoiles Rouges"
+
+msgid "south"
+msgstr "Etoile"
+
+msgid "south following"
+msgstr ""
+
+msgid "south preceding"
+msgstr ""
+
+msgid "scattered"
+msgstr ""
+
+msgid "several"
+msgstr ""
+
+msgid "stars (pl.)"
+msgstr "항성"
+
+msgid "stars of 9th magnitude and fainter"
+msgstr "9등급 및 더 어두운 항성"
+
+msgid "stars of mag. 9 to 13"
+msgstr "9~13 등급 항성"
+
+msgid "stellar, pointlike"
+msgstr "별상"
+
+msgid "suspected"
+msgstr "의심스러운"
+
+msgid "small in angular size"
+msgstr "작은 각크기"
+
+msgid "trapezium"
+msgstr "트라페지움"
+
+msgid "triangle, forms a triangle with"
+msgstr "삼각형"
+
+msgid "trinuclear"
+msgstr "삼핵"
+
+msgid "very"
+msgstr "매우"
+
+msgid "_very_"
+msgstr "매우"
+
+msgid "variable"
+msgstr "변화"
+
+msgid "remarkable"
+msgstr "뛰어난"
+
+msgid "very much so"
+msgstr "어느정도"
+
+msgid "a magnificent or otherwise interesting object"
+msgstr "흥미로운 대상"
+
+msgid "HELP"
+msgstr "도움말"
+
+msgid "Loaded"
+msgstr "설정됨"
+
+msgid "Deleted"
+msgstr "살제됨"
+
+msgid "Renamed"
+msgstr "명칭변경됨"
+
+msgid "IMU Sensit."
+msgstr "IMU민감도"
+
+msgid "Very Low"
+msgstr "매우낮음"
+
+msgid "10s"
+msgstr "10초"
+
+msgid "20s"
+msgstr "20초"
+
+msgid "30s"
+msgstr "30초"
+
+msgid "1m"
+msgstr "1분"
+
+msgid "2m"
+msgstr "2분"
+
+msgid "Format"
+msgstr "형식"
+
+msgid "Nav"
+msgstr "이동"
+
+msgid "Toggle"
+msgstr "전환"
+
+msgid "Go"
+msgstr "선택"
+
+msgid "Del"
+msgstr "삭제"
+
+msgid "   Catalogs"
+msgstr "   카탈로그"
+
+msgid "  Mount Control"
+msgstr "  마운트 제어"
+
+msgid "   Menus"
+msgstr "   메뉴"
+
+msgid "Degraded\nCheck Status"
+msgstr "성능저하\n상태 확인"
+
+msgid "   Solver"
+msgstr "   솔버"
+
+msgid "   Webserver"
+msgstr "   웹서버"
+
+msgid "   IMU"
+msgstr "   관성측정센서"
+
+msgid "   Camera"
+msgstr "   카메라"
+

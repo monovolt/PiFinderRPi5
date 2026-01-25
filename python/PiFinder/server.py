@@ -25,6 +25,7 @@ from bottle import (
     debug,
     redirect,
     CherootServer,
+    SimpleTemplate,
 )
 
 sys_utils = utils.get_sys_utils()
@@ -96,6 +97,11 @@ class Server:
         }
 
         self.network = sys_utils.Network()
+
+        # Set global template variables
+        SimpleTemplate.defaults["mount_control_active"] = (
+            sys_utils.is_mountcontrol_active()
+        )
 
         app = Bottle()
         debug(True)
@@ -407,7 +413,7 @@ class Server:
             self.network.add_wifi_network(ssid, key_mgmt, psk)
             return network_page()
 
-        @app.route("/network/delete/<network_id:int>")
+        @app.route("/network/delete/<network_id>")
         @auth_required
         def network_delete(network_id):
             self.network.delete_wifi_network(network_id)

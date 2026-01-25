@@ -32,22 +32,24 @@ class CameraPI(CameraInterface):
         self.format = "SRGGB12"
         self.bit_depth = 12
         self.digital_gain = 1.0  # TODO: find optimum value for imx296 and imx290
-        self.offset = 0  # TODO: measure offset for imx296 and imx290
+        self.offset = 30  # TODO: measure offset for imx296 and imx290
 
         # Figure out camera type, hq or imx296 (global shutter)
         if "imx296" in self.camera.camera.id:
             self.camera_type = "imx296"
+            print("imx296")
             # The auto selected 728x544 sensor mode returns black frames if the
             # exposure is too high
             self.raw_size = (1456, 1088)
-            self.format = "R10"
-            self.bit_depth = 10
+            self.format = "R16"
+            self.bit_depth = 16
             # maximum analog gain for this sensor
             self.gain = 15
         elif "imx290" in self.camera.camera.id:
             self.camera_type = "imx462"
             self.raw_size = (1920, 1080)
             self.gain = 30
+            self.bit_depth = 16
         elif "imx477" in self.camera.camera.id:
             self.camera_type = "hq"
             # using this smaller scale auto-selects binning on the sensor
@@ -77,12 +79,16 @@ class CameraPI(CameraInterface):
         self.camera.set_controls({"AnalogueGain": self.gain})
         self.camera.set_controls({"ExposureTime": self.exposure_time})
         self.start_camera()
+        #print("Camera Init ...\r\n")
 
     def start_camera(self) -> None:
+
+        #print("Camera Start ...\r\n")
         self.camera.start()
         self._camera_started = True
 
     def stop_camera(self) -> None:
+        #print("Camera Stop ...\r\n")
         self.camera.stop()
         self._camera_started = False
 
@@ -92,10 +98,13 @@ class CameraPI(CameraInterface):
         it to an 8 bit mono image stretched to use the maximum
         amount of the 255 level space.
         """
+        #print("Camera Capture ...\r\n")
         _request = self.camera.capture_request()
         # raw is actually 16 bit
         raw_capture = _request.make_array("raw").copy().view(np.uint16)
-        # tmp_image = _request.make_image("main")
+        #tmp_image = _request.make_image("raw")
+        #ztmp_image.save("raw0.png")
+
         _request.release()
         # crop to square
         if self.camera_type == "imx296":
@@ -124,10 +133,13 @@ class CameraPI(CameraInterface):
 
         # convert to PIL image and resize to 512x512
         raw_image = Image.fromarray(raw_capture).resize((512, 512))
-
+        #self.camera.capture_file
+        #raw_image.save("raw.png")
+        #exit(0)
         return raw_image
 
     def capture_file(self, filename) -> None:
+        #print("Camera Save ...\r\n")
         tmp_capture = self.capture()
         tmp_capture.save(filename)
 
@@ -149,6 +161,7 @@ def get_images(shared_state, camera_image, command_queue, console_queue, log_que
     Instantiates the camera hardware
     then calls the universal image loop
     """
+    #print("Camera get Image ...\r\n")
     MultiprocLogging.configurer(log_queue)
 
     cfg = config.Config()

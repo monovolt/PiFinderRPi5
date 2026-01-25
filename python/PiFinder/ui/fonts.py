@@ -44,8 +44,12 @@ class Fonts:
         screen_width=128,
     ):
         font_path = str(Path(Path.cwd(), "../fonts"))
-        boldttf = str(Path(font_path, "RobotoMonoNerdFontMono-Bold.ttf"))
-        regularttf = str(Path(font_path, "RobotoMonoNerdFontMono-Regular.ttf"))
+        #boldttf = str(Path(font_path, "RobotoMonoNerdFontMono-Bold.ttf"))
+        boldttf = str(Path(font_path, "RobotoMonoNFM-Rg.ttf"))
+        #boldttf = str(Path(font_path, "NotoSerifKR-Light.ttf"))
+        #regularttf = str(Path(font_path, "RobotoMonoNerdFontMono-Regular.ttf"))
+        regularttf = str(Path(font_path, "RobotoMonoNFM-Bd.ttf"))
+        #regularttf = str(Path(font_path, "NotoSerifKR-Bold.ttf"))
 
         self.base = Font(boldttf, base_size, screen_width)  # 10
         self.bold = Font(boldttf, bold_size, screen_width)  # 12

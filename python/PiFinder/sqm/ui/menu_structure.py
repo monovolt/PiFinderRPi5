@@ -10,7 +10,7 @@ from PiFinder.ui.chart import UIChart
 from PiFinder.ui.align import UIAlign
 from PiFinder.ui.textentry import UITextEntry
 from PiFinder.ui.preview import UIPreview
-#from PiFinder.ui.sqm import UISQM
+from PiFinder.ui.sqm import UISQM
 from PiFinder.ui.equipment import UIEquipment
 from PiFinder.ui.location_list import UILocationList
 from PiFinder.ui.radec_entry import UIRADecEntry
@@ -275,10 +275,6 @@ pifinder_menu = {
                             "value": "PL",
                         },
                         {
-                            "name": _("Comets"),
-                            "value": "CM",
-                        },
-                        {
                             "name": _("NGC"),
                             "value": "NGC",
                         },
@@ -436,7 +432,7 @@ pifinder_menu = {
                         },
                         {
                             "name": _("Comet"),
-                            "value": "Com",
+                            "value": "CM",
                         },
                         {
                             "name": _("Unknown"),
@@ -1072,23 +1068,45 @@ pifinder_menu = {
                     "name": _("Experimental"),
                     "class": UITextMenu,
                     "select": "Single",
-                    "items": [{
-                            "name": _("Mount Control"),
+                    "items": [
+                        {"name": "SQM", "class": UISQM},
+                        {
+                            "name": _("AE Algo"),
                             "class": UITextMenu,
-                            "select": "Single",
-                            "label": "mountcontrol",
-                            "value_callback": callbacks.get_mountcontrol_status,
+                            "select": "single",
+                            "config_option": "auto_exposure_zero_star_handler",
+                            "label": "auto_exp_zero_star_handler",
+                            "post_callback": callbacks.set_auto_exposure_zero_star_handler,
                             "items": [
                                 {
-                                    "name": _("Mount Control"),
-                                    "value": "mountcontrol_on",
-                                    "callback": callbacks.mountcontrol_activate,
+                                    "name": _("Sweep"),
+                                    "value": "sweep",
                                 },
                                 {
-                                    "name": _("No Mount Control"),
-                                    "value": "mountcontrol_off",
-                                    "callback": callbacks.mountcontrol_deactivate,
+                                    "name": _("Exponential"),
+                                    "value": "exponential",
                                 },
+                                {
+                                    "name": _("Reset to 0.4s"),
+                                    "value": "reset",
+                                },
+                                {
+                                    "name": _("Histogram"),
+                                    "value": "histogram",
+                                },
+                            ],
+                        },
+                        {
+                            "name": _("Capture Exp Sweep"),
+                            "class": UITextMenu,
+                            "select": "single",
+                            "label": "capture_exp_sweep",
+                            "items": [
+                                {
+                                    "name": _("Confirm"),
+                                    "callback": callbacks.capture_exposure_sweep,
+                                },
+                                {"name": _("Cancel"), "callback": callbacks.go_back},
                             ],
                         },
                     ],

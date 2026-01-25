@@ -1,10 +1,11 @@
 # mypy: ignore-errors
+from datetime import datetime, timezone
 import logging
 import time
 import datetime
 import pytz
-from pprint import pformat
 import threading
+from pprint import pformat
 from typing import List, Dict, DefaultDict, Optional, Union
 from collections import defaultdict
 import PiFinder.calc_utils as calc_utils
@@ -658,6 +659,7 @@ class PlanetCatalog(TimerCatalog):
             return 10
 
     def init_planets(self, dt):
+        dt = dt.astimezone(timezone.utc)
         planet_dict = sf_utils.calc_planets(dt)
         logger.debug(f"starting planet dict {planet_dict}")
 
@@ -760,7 +762,10 @@ class CometCatalog(TimerCatalog):
                             self, self.virtual_id_low
                         )
                         self.virtual_id_low = new_low
-                    break
+                    
+                    if self.initialized :
+                        break
+
                 time.sleep(60)  # retry every minute to download comet data
 
         threading.Thread(target=init_task, daemon=True).start()

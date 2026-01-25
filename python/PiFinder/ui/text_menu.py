@@ -195,7 +195,7 @@ class UITextMenu(UIModule):
                     setattr(self.catalogs.catalog_filter, filter_attr, config_value)
 
             else:
-                if selected_item == "Select All":
+                if selected_item == _("Select All"):
                     # Only select items with a value key which represent
                     # configuration values
                     for item in self._menu_items[1:]:
@@ -205,9 +205,12 @@ class UITextMenu(UIModule):
 
                     # Uniqify selected values
                     self._selected_values = list(set(self._selected_values))
-                    self._menu_items[0] = "Select None"
+                    self._menu_items[0] = _(
+                        "Select None"
+                    )
+                    
 
-                elif selected_item == "Select None":
+                elif selected_item == _("Select None"):
                     # We need to be selective here and ONLY remove
                     # items that are in THIS list/menu as this maybe
                     # a mulit-level selector like Catalogs

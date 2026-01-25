@@ -29,6 +29,7 @@ from pathlib import Path
 from PIL import Image, ImageOps
 from multiprocessing import Process, Queue
 from multiprocessing.managers import BaseManager
+import RPi.GPIO as GPIO
 
 import PiFinder.i18n  # noqa: F401
 from PiFinder import solver
@@ -38,6 +39,7 @@ from PiFinder import pos_server
 from PiFinder import utils
 from PiFinder import server
 from PiFinder import keyboard_interface
+from PiFinder import mountcontrol_indi
 
 from PiFinder.multiproclogging import MultiprocLogging
 from PiFinder.catalogs import CatalogBuilder, CatalogFilter, Catalogs
@@ -60,14 +62,49 @@ if TYPE_CHECKING:
     def _(a) -> Any:
         return a
 
-
 logger = logging.getLogger("main")
 
 hardware_platform = "Pi"
 display_hardware = "SSD1351"
 display_device: DisplayBase = DisplayBase()
 keypad_pwm = None
+previous_display_brightness = 0
 
+# On/Off Switch GPIO
+on_off_swtich = 6
+
+# On/Off switch interrupt setup
+def init_on_off_switch():
+    try:
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(on_off_swtich, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Example with pull-up
+        GPIO.add_event_detect(on_off_swtich, GPIO.BOTH, callback=on_off_callback, bouncetime=200)
+        logger.info("Started : On/Off Switch monitor..")
+    except KeyboardInterrupt:
+        logger.error("Failed : On/Off Switch monitor..")
+
+# On/Off switch callback
+def on_off_callback(channel):
+    if GPIO.input(channel) == GPIO.HIGH:
+        print(f"Rising edge detected on GPIO {channel}")
+        on_light()
+    else:
+        print(f"Falling edge detected on GPIO {channel}")
+        off_light()
+
+# Turn on the keyboard and dispaly to the orignal brightness
+def on_light() :
+    set_brightness(previous_display_brightness)
+
+# Turn off the keyboard and display
+def off_light() :
+    global keypad_pwm
+    global display_device
+
+    if keypad_pwm:
+        keypad_pwm.change_duty_cycle(0)
+    
+    display_device.set_brightness(0)
 
 def init_keypad_pwm():
     # TODO: Keypad pwm class that can be faked maybe?
@@ -95,24 +132,26 @@ def set_brightness(level, cfg):
     Sets oled/keypad brightness
     0-255
     """
-    global display_device
-    display_device.set_brightness(level)
+    if GPIO.input(on_off_swtich) == GPIO.HIGH :
+        global display_device
+        display_device.set_brightness(level)
+        previous_display_brightness = level
 
-    if keypad_pwm:
-        # determine offset for keypad
-        keypad_offsets = {
-            "+3": 2,
-            "+2": 1.6,
-            "+1": 1.3,
-            "0": 1,
-            "-1": 0.75,
-            "-2": 0.5,
-            "-3": 0.25,
-            "-4": 0.13,
-            "Off": 0,
-        }
-        keypad_brightness = cfg.get_option("keypad_brightness")
-        set_keypad_brightness(level * 0.05 * keypad_offsets[keypad_brightness])
+        if keypad_pwm:
+            # determine offset for keypad
+            keypad_offsets = {
+                "+3": 2,
+                "+2": 1.6,
+                "+1": 1.3,
+                "0": 1,
+                "-1": 0.75,
+                "-2": 0.5,
+                "-3": 0.25,
+                "-4": 0.13,
+                "Off": 0,
+            }
+            keypad_brightness = cfg.get_option("keypad_brightness")
+            set_keypad_brightness(level * 0.05 * keypad_offsets[keypad_brightness])
 
 
 def setup_dirs():
@@ -229,21 +268,23 @@ class PowerManager:
         return screen_off
 
     def wake_screen(self) -> None:
-        screen_brightness = self.cfg.get_option("display_brightness")
-        set_brightness(screen_brightness, self.cfg)
-        self.display_device.device.show()
+        if GPIO.input(on_off_swtich) == GPIO.HIGH :
+            screen_brightness = self.cfg.get_option("display_brightness")
+            set_brightness(screen_brightness, self.cfg)
+            self.display_device.device.show()
 
     def sleep_screen(self):
-        screen_brightness = self.cfg.get_option("display_brightness")
-        set_brightness(int(screen_brightness / 4), self.cfg)
-        self.display_device.device.show()
-
+        if GPIO.input(on_off_swtich) == GPIO.HIGH :
+            screen_brightness = self.cfg.get_option("display_brightness")
+            set_brightness(int(screen_brightness / 4), self.cfg)
+            self.display_device.device.show()
 
 def main(
     log_helper: MultiprocLogging,
     script_name=None,
     show_fps=False,
     verbose=False,
+    profile_startup=False,
 ) -> None:
     """
     Get this show on the road!
@@ -266,6 +307,7 @@ def main(
     alignment_command_queue: Queue = Queue()
     alignment_response_queue: Queue = Queue()
     ui_queue: Queue = Queue()
+    mountcontrol_queue: Queue = Queue()
 
     # init queues for logging
     keyboard_logqueue: Queue = log_helper.get_queue()
@@ -276,6 +318,7 @@ def main(
     posserver_logqueue: Queue = log_helper.get_queue()
     integrator_logqueque: Queue = log_helper.get_queue()
     imu_logqueue: Queue = log_helper.get_queue()
+    mountcontrol_logqueue: Queue = log_helper.get_queue()
 
     # Start log consolidation process first.
     log_helper.start()
@@ -291,7 +334,11 @@ def main(
         "align_command": alignment_command_queue,
         "align_response": alignment_response_queue,
         "gps": gps_queue,
+        "mountcontrol": mountcontrol_queue,
     }
+
+    init_on_off_switch()
+
     cfg = config.Config()
 
     # init screen
@@ -299,6 +346,7 @@ def main(
     set_brightness(screen_brightness, cfg)
     if cfg.get_option("screen_direction") == "as_bloom":
         display_device.device.rotate = 3
+
 
     # Set user interface language
     lang = cfg.get_option("language", "en")
@@ -367,8 +415,8 @@ def main(
             p.start()
 
         # Web server
-        console.write("   Webserver")
-        logger.info("   Webserver")
+        console.write(_("   Webserver"))
+        logger.info(_("   Webserver"))
         console.update()
 
         server_process = Process(
@@ -385,8 +433,8 @@ def main(
         )
         server_process.start()
 
-        console.write("   Camera")
-        logger.info("   Camera")
+        console.write(_("   Camera"))
+        logger.info(_("   Camera"))
         console.update()
         camera_image = manager.NewImage("RGB", (512, 512))  # type: ignore[attr-defined]
         image_process = Process(
@@ -404,8 +452,8 @@ def main(
         time.sleep(1)
 
         # IMU
-        console.write("   IMU")
-        logger.info("   IMU")
+        console.write(_("   IMU"))
+        logger.info(_("   IMU"))
         console.update()
         imu_process = Process(
             name="IMU",
@@ -415,8 +463,8 @@ def main(
         imu_process.start()
 
         # Solver
-        console.write("   Solver")
-        logger.info("   Solver")
+        console.write(_("   Solver"))
+        logger.info(_("   Solver"))
         console.update()
         solver_process = Process(
             name="Solver",
@@ -462,9 +510,29 @@ def main(
         )
         posserver_process.start()
 
+        # Mount Control
+        sys_utils = utils.get_sys_utils()
+        if sys_utils.is_mountcontrol_active():
+            console.write(_("  Mount Control"))
+            logger.info(_("  Mount Control"))
+            console.update()
+            mountcontrol_process = Process(
+                name="MountControl",
+                target=mountcontrol_indi.run,
+                args=(
+                    mountcontrol_queue,
+                    console_queue,
+                    shared_state,
+                    mountcontrol_logqueue,
+                    "localhost",
+                    7624,
+                ),
+            )
+            mountcontrol_process.start()
+
         # Initialize Catalogs
-        console.write("   Catalogs")
-        logger.info("   Catalogs")
+        console.write(_("   Catalogs"))
+        logger.info(_("   Catalogs"))
         console.update()
 
         # Initialize Catalogs
@@ -474,7 +542,7 @@ def main(
         _new_filter = CatalogFilter(shared_state=shared_state)
         _new_filter.load_from_config(cfg)
         catalogs.set_catalog_filter(_new_filter)
-        console.write("   Menus")
+        console.write(_("   Menus"))
         console.update()
 
         # Initialize menu manager
@@ -490,6 +558,14 @@ def main(
         # Initialize power manager
         power_manager = PowerManager(cfg, shared_state, display_device)
 
+        #On/Off switch
+        if GPIO.input(on_off_swtich) == GPIO.LOW :
+            logger.info("Off Display")
+            off_light()
+        else :
+            logger.info("On Display")
+
+
         # Start main event loop
         console.write("   Event Loop")
         logger.info("   Event Loop")
@@ -502,11 +578,20 @@ def main(
                 # Console
                 try:
                     console_msg = console_queue.get(block=False)
-                    if console_msg.startswith("DEGRADED_OPS"):
-                        menu_manager.message(_("Degraded\nCheck Status"), 5)
-                        time.sleep(5)
+                    if isinstance(console_msg, list):
+                        for item in console_msg:
+                            if item.startswith("DEGRADED_OPS"):
+                                menu_manager.message(_("Degraded\nCheck Status"), 5)
+                                time.sleep(5)
+                            else:
+                                console.write(item)
                     else:
-                        console.write(console_msg)
+                        if console_msg.startswith("DEGRADED_OPS"):
+                            menu_manager.message(_("Degraded\nCheck Status"), 5)
+                            time.sleep(5)
+                        else:
+                            console.write(console_msg)
+
                 except queue.Empty:
                     time.sleep(0.1)
 
@@ -791,6 +876,9 @@ def main(
 
             logger.info("\tPos Server...")
             posserver_process.join()
+
+            logger.info("\tMount Control...")
+            mountcontrol_process.join()
 
             logger.info("\tGPS...")
             gps_process.terminate()

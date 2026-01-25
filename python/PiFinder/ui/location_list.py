@@ -94,7 +94,7 @@ class UILocationList(UITextMenu):
                     self.config_object.save_locations()
 
                 # Show confirmation message
-                self.message(f"Loaded: {location.name}", timeout=2)
+                self.message(_("Loaded") + f": {location.name}", timeout=2)
 
                 # Return True twice to pop two levels
                 self.action_menu_active = False  # Exit action menu mode
@@ -117,7 +117,7 @@ class UILocationList(UITextMenu):
                     )
 
                 self.selected_index = None
-                self.message(f"Deleted: {location.name}", timeout=2)
+                self.message(_("Deleted") + f": {location.name}", timeout=2)
                 self.action_menu_active = False
                 return False
 
@@ -137,7 +137,7 @@ class UILocationList(UITextMenu):
         """Handle location rename callback"""
         location.name = new_name
         self.config_object.save_locations()
-        self.message(f"Renamed to:\n{new_name}", timeout=2)
+        self.message(_("Renamed") + f":\n{new_name}", timeout=2)
         self.action_menu_active = False  # Return to location list view
         return True  # Return to location list
 

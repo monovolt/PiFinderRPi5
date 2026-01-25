@@ -217,7 +217,7 @@ class UIPreview(UIModule):
                 image_obj = Image.eval(image_obj, gamma_correct_med)
             elif gamma_adjust == "High":
                 image_obj = Image.eval(image_obj, gamma_correct_high)
-
+            #print("image update")
             self.screen.paste(image_obj)
             self.last_update = last_image_time
 

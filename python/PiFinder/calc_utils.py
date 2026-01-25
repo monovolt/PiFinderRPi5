@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import pytz
 import math
 import numpy as np
@@ -30,8 +30,8 @@ class FastAltAz:
     def __init__(self, lat, lon, dt):
         self.lat = lat
         self.lon = lon
-        self.dt = dt
-
+        
+        self.dt = dt.astimezone(timezone.utc)
         j2000 = datetime(2000, 1, 1, 12, 0, 0)
         utc_tz = pytz.timezone("UTC")
         j2000 = utc_tz.localize(j2000)

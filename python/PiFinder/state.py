@@ -139,6 +139,50 @@ SharedStateObj(
 )
 """
 
+'''
+
+@dataclass
+class SQM:
+    """
+    Sky Quality Meter - represents the sky brightness measurement.
+    """
+
+    value: float = (
+        20.15  # mag/arcsec² - default typical dark sky value (processed 8-bit)
+    )
+    value_raw: Optional[float] = (
+        None  # mag/arcsec² - from raw 16-bit pipeline (more accurate)
+    )
+    source: str = "None"  # "None", "Calculated", "Manual", etc.
+    last_update: Optional[str] = None  # ISO timestamp of last update
+
+    def __str__(self):
+        raw_str = f", raw={self.value_raw:.2f}" if self.value_raw is not None else ""
+        return (
+            f"SQM(value={self.value:.2f} mag/arcsec²{raw_str}, "
+            f"source={self.source}, "
+            f"last_update={self.last_update or 'Never'})"
+        )
+
+    def to_dict(self):
+        """Convert the SQM object to a dictionary."""
+        return asdict(self)
+
+    def to_json(self):
+        """Convert the SQM object to a JSON string."""
+        return json.dumps(self.to_dict())
+
+    @classmethod
+    def from_dict(cls, data):
+        """Create an SQM object from a dictionary."""
+        return cls(**data)
+
+    @classmethod
+    def from_json(cls, json_str):
+        """Create an SQM object from a JSON string."""
+        data = json.loads(json_str)
+        return cls.from_dict(data)
+'''
 
 @dataclass
 class Location:

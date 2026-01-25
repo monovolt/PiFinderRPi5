@@ -1,9 +1,10 @@
+import os
 import glob
 import re
 from typing import Dict, Any
+import time
 
 import sh
-from sh import wpa_cli, unzip, su, passwd
 
 import socket
 from PiFinder import utils
@@ -21,22 +22,71 @@ class Network:
 
     def __init__(self):
         self.wifi_txt = f"{utils.pifinder_dir}/wifi_status.txt"
-        with open(self.wifi_txt, "r") as wifi_f:
-            self._wifi_mode = wifi_f.read()
+        logger.info("SYS: Wifi loc "+self.wifi_txt)
+        try :
+            with open(self.wifi_txt, "r") as wifi_f:
+                self._wifi_mode = wifi_f.read()
+        except Exception:            
+            logger.info("File open error : " + self.wifi_txt)
 
         self.populate_wifi_networks()
 
     def populate_wifi_networks(self) -> None:
-        wpa_supplicant_path = "/etc/wpa_supplicant/wpa_supplicant.conf"
         self._wifi_networks = []
-        try:
-            with open(wpa_supplicant_path, "r") as wpa_conf:
-                contents = wpa_conf.readlines()
-        except IOError as e:
-            logger.error(f"Error reading wpa_supplicant.conf: {e}")
-            return
 
-        self._wifi_networks = Network._parse_wpa_supplicant(contents)
+        directory_path = "/etc/NetworkManager/system-connections"  # Replace with the actual directory path
+        entries = os.listdir(directory_path)
+        files_only = [entry for entry in entries if os.path.isfile(os.path.join(directory_path, entry))]
+        contents = []
+        for entry in files_only:
+            try:
+                if Network.isAP(f"{directory_path}/{entry}") != True :
+                    sh.sudo("cp",f"{directory_path}/{entry}", "/tmp/test")
+                    sh.sudo("chmod","777", "/tmp/test")
+
+                    try : 
+                        with open("/tmp/test", "r") as conf:
+                            contents.extend(conf.readlines())
+                    except Exception:            
+                        logger.info("File open error : /tmp/test")
+
+                    sh.sudo("rm", "/tmp/test")
+            except IOError as e:
+                logger.error(f"Error reading wpa_supplicant.conf: {e}")
+
+        self._wifi_networks = Network._parse_networkmanager(contents)
+
+    @staticmethod
+    def _parse_networkmanager(contents: list[str]) -> list:
+        wifi_networks = []
+        network_dict: Dict[str, Any] = {}
+        network_id = 0
+        in_network_block = False
+        for line in contents:
+            line = line.strip()
+            if line.startswith("[connection]"):
+                in_network_block = True
+                network_dict = {
+                    "id": network_id,
+                    "ssid": None,
+                    "psk": None,
+                    "key_mgmt": None,
+                    "uuid": None,
+                }
+
+            elif line == "[proxy]" and in_network_block:
+                in_network_block = False
+                wifi_networks.append(network_dict)
+                network_id += 1
+
+            elif in_network_block:
+                match = re.match(r"(\w+)=(.+)", line)
+                if match:
+                    key, value = match.groups()
+                    if key in network_dict:
+                        network_dict[key] = value.strip('"')
+        return wifi_networks
+
 
     @staticmethod
     def _parse_wpa_supplicant(contents: list[str]) -> list:
@@ -56,6 +106,7 @@ class Network:
                     "ssid": None,
                     "psk": None,
                     "key_mgmt": None,
+                    "uuid": None,
                 }
 
             elif line == "}" and in_network_block:
@@ -75,74 +126,199 @@ class Network:
     def get_wifi_networks(self):
         return self._wifi_networks
 
-    def delete_wifi_network(self, network_id):
+    def delete_wifi_network(self, network_uuid):
         """
         Immediately deletes a wifi network
         """
-        self._wifi_networks.pop(network_id)
-
-        with open("/etc/wpa_supplicant/wpa_supplicant.conf", "r") as wpa_conf:
-            wpa_contents = list(wpa_conf)
-
-        with open("/etc/wpa_supplicant/wpa_supplicant.conf", "w") as wpa_conf:
-            in_networks = False
-            for line in wpa_contents:
-                if not in_networks:
-                    if line.startswith("network={"):
-                        in_networks = True
-                    else:
-                        wpa_conf.write(line)
-
-            for network in self._wifi_networks:
-                ssid = network["ssid"]
-                key_mgmt = network["key_mgmt"]
-                psk = network["psk"]
-
-                wpa_conf.write("\nnetwork={\n")
-                wpa_conf.write(f'\tssid="{ssid}"\n')
-                if key_mgmt == "WPA-PSK":
-                    wpa_conf.write(f'\tpsk="{psk}"\n')
-                wpa_conf.write(f"\tkey_mgmt={key_mgmt}\n")
-
-                wpa_conf.write("}\n")
-
+        directory_path = "/etc/NetworkManager/system-connections"  # Replace with the actual directory path
+        entries = os.listdir(directory_path)
+        files_only = [entry for entry in entries if os.path.isfile(os.path.join(directory_path, entry))]
+        contents = ""
+        for entry in files_only:
+            try:
+                if Network.isAP(f"{directory_path}/{entry}") != True :
+                    sh.sudo("cp",f"{directory_path}/{entry}", "/tmp/test")
+                    sh.sudo("chmod","777", "/tmp/test")
+                    try : 
+                        with open("/tmp/test", "r") as conf:
+                            contents = conf.read()
+                            if network_uuid in contents:
+                                sh.sudo("rm",f"{directory_path}/{entry}")
+                    except Exception:            
+                        logger.info("File open error : /tmp/test")
+                    
+                    sh.sudo("rm", "/tmp/test")
+            except IOError as e:
+                logger.error(f"Error reading wpa_supplicant.conf: {e}")
+        
         self.populate_wifi_networks()
+        
 
     def add_wifi_network(self, ssid, key_mgmt, psk=None):
         """
         Add a wifi network
         """
-        with open("/etc/wpa_supplicant/wpa_supplicant.conf", "a") as wpa_conf:
-            wpa_conf.write("\nnetwork={\n")
-            wpa_conf.write(f'\tssid="{ssid}"\n')
-            if key_mgmt == "WPA-PSK":
-                wpa_conf.write(f'\tpsk="{psk}"\n')
-            wpa_conf.write(f"\tkey_mgmt={key_mgmt}\n")
+        '''if self._wifi_mode == "AP":
+            self.remove_ap()
+            sh.sudo("nmcli","connection", "add", "type", "wifi", "ifname", "wlan0", "con-name", ssid, "ssid", ssid, "mode", "ap")
+            sh.sudo("nmcli","connection", "modify", ssid, "connection.autoconnect", "yes")
+            sh.sudo("nmcli","connection", "modify", ssid, "connection.autoconnect-priority", "1")
+            with open('/tmp/switch-ap.sh', 'w') as f:
+                f.write("#! /usr/bin/bash\n")
+                f.write("nmcli connection up "+ssid+"\n")
+                f.write('echo -n "AP" > /home/pifinder/PiFinder5/wifi_status.txt')
+            
+            sh.sudo("cp","/tmp/switch-ap.sh","/home/pifinder/PiFinder5/switch-ap.sh")
 
-            wpa_conf.write("}\n")
+        else:'''
+
+        sh.sudo("nmcli","connection", "add", "type", "wifi", "ifname", "wlan0", "con-name", ssid, "ssid", ssid, "mode", "infrastructure")
+        sh.sudo("nmcli","connection", "modify", ssid, "connection.autoconnect", "yes")
+        sh.sudo("nmcli","connection", "modify", ssid, "connection.autoconnect-priority", "0")
+
+        if key_mgmt == "WPA-PSK":
+            sh.sudo("nmcli","connection", "modify", ssid, "wifi-sec.key-mgmt", "wpa-psk")
+            sh.sudo("nmcli","connection", "modify", ssid, "wifi-sec.psk", psk) 
+
 
         self.populate_wifi_networks()
+        
         if self._wifi_mode == "Client":
-            # Restart the supplicant
-            wpa_cli("reconfigure")
+
+            Network.set_client_priority("1")
+            Network.set_ap_priority("0")
+            
+            sh.sudo("/home/pifinder/PiFinder5/switch-cli.sh")
+
+    def set_client_priority(flag):
+        
+        directory_path = "/etc/NetworkManager/system-connections"  # Replace with the actual directory path
+        entries = os.listdir(directory_path)
+        files_only = [entry for entry in entries if os.path.isfile(os.path.join(directory_path, entry))]
+
+        for entry in files_only:
+            
+            if Network.isAP(f"{directory_path}/{entry}") == False:
+                sh.sudo("cp",f"{directory_path}/{entry}", "/tmp/test")
+                sh.sudo("chmod","777", "/tmp/test")
+                logger.info("SYS: Open /tmp/test")
+                try : 
+                    with open("/tmp/test", "r") as conf:
+                        contents = conf.readlines()
+                        for line in contents:
+                            line = line.strip()
+                            logger.info("SYS: Read line")
+                            match = re.match(r"(\w+)=(.+)", line)
+                            if match:
+                                key, value = match.groups()
+                                logger.info("SYS: Matched " + key)
+                                if key == "ssid" :
+                                    sh.sudo("nmcli","connection", "modify", value, "connection.autoconnect-priority", flag)
+                except Exception:            
+                    logger.info("File open error : /tmp/test")
+
+                sh.sudo("rm", "/tmp/test")
+
+    def set_ap_priority(flag):
+        directory_path = "/etc/NetworkManager/system-connections"  # Replace with the actual directory path
+        entries = os.listdir(directory_path)
+        files_only = [entry for entry in entries if os.path.isfile(os.path.join(directory_path, entry))]
+
+        for entry in files_only:
+            if Network.isAP(f"{directory_path}/{entry}") == True:
+                sh.sudo("cp",f"{directory_path}/{entry}", "/tmp/test")
+                sh.sudo("chmod","777", "/tmp/test")
+
+                try: 
+                    with open("/tmp/test", "r") as conf:
+                        contents = conf.readlines()
+                        for line in contents:
+                            line = line.strip()
+                            match = re.match(r"(\w+)=(.+)", line)
+                            if match:
+                                key, value = match.groups()
+                                if key == "ssid" :
+                                    sh.sudo("nmcli","connection", "modify", value, "connection.autoconnect-priority", flag)
+                except Exception:            
+                    logger.info("File open error : /tmp/test")
+
+                sh.sudo("rm", "/tmp/test")
+
+    def remove_ap(self):
+        directory_path = "/etc/NetworkManager/system-connections"  # Replace with the actual directory path
+        entries = os.listdir(directory_path)
+        files_only = [entry for entry in entries if os.path.isfile(os.path.join(directory_path, entry))]
+
+        for entry in files_only:
+            if Network.isAP(f"{directory_path}/{entry}") :
+                sh.sudo("rm",f"{directory_path}/{entry}")
+                time.sleep(1)
+
+    def isAP(file):
+        sh.sudo("cp", file, "/tmp/test")
+        sh.sudo("chmod","777", "/tmp/test")
+        try : 
+            with open("/tmp/test", "r") as conf:
+                for line in conf:
+                    if line.startswith("mode="):
+                        val = line[5:-1]
+                        if val == "ap" :
+                            return True
+        except Exception:            
+            logger.info("File open error : /tmp/test")
+
+        
+        sh.sudo("rm", "/tmp/test")
+        
+        return False
 
     def get_ap_name(self):
-        with open("/etc/hostapd/hostapd.conf", "r") as conf:
-            for line in conf:
-                if line.startswith("ssid="):
-                    return line[5:-1]
+        directory_path = "/etc/NetworkManager/system-connections"  # Replace with the actual directory path
+        entries = os.listdir(directory_path)
+        files_only = [entry for entry in entries if os.path.isfile(os.path.join(directory_path, entry))]
+
+        for entry in files_only:
+            if Network.isAP(f"{directory_path}/{entry}") :
+                sh.sudo("cp",f"{directory_path}/{entry}", "/tmp/test")
+                sh.sudo("chmod","777", "/tmp/test")
+
+                try :
+                    with open("/tmp/test", "r") as conf:
+                        contents = conf.readlines()
+                        for line in contents:
+                            line = line.strip()
+                            match = re.match(r"(\w+)=(.+)", line)
+                            if match:
+                                key, value = match.groups()
+                                if key == "ssid" :
+                                    sh.sudo("rm", "/tmp/test")
+                                    return value
+                except Exception:            
+                    logger.info("File open error : /tmp/test")
+
+                sh.sudo("rm", "/tmp/test")
+
         return "UNKN"
 
     def set_ap_name(self, ap_name):
         if ap_name == self.get_ap_name():
             return
-        with open("/tmp/hostapd.conf", "w") as new_conf:
-            with open("/etc/hostapd/hostapd.conf", "r") as conf:
-                for line in conf:
-                    if line.startswith("ssid="):
-                        line = f"ssid={ap_name}\n"
-                    new_conf.write(line)
-        sh.sudo("cp", "/tmp/hostapd.conf", "/etc/hostapd/hostapd.conf")
+        
+        ap = self.get_ap_name()
+
+        if ap != "UNKN" :
+            sh.sudo("nmcli","connection", "modify", ap, "ssid", ap_name) 
+            sh.sudo("nmcli","connection", "modify", ap, "con-name", ap_name) 
+            #directory_path = "/etc/NetworkManager/system-connections"  # Replace with the actual directory path
+            #sh.sudo("mv",directory_path+"/"+ap+".nmconnection",directory_path+"/"+ap_name+".nmconnection")
+            #time.sleep(1)
+            #sh.sudo("rm",directory_path+"/"+ap+".nmconnection")
+            time.sleep(1)
+
+            if self._wifi_mode != "Client":
+                Network.set_client_priority("0")
+                Network.set_ap_priority("1")
+                go_wifi_ap()
 
     def get_host_name(self):
         return socket.gethostname()
@@ -196,13 +372,29 @@ class Network:
 
 def go_wifi_ap():
     logger.info("SYS: Switching to AP")
-    sh.sudo("/home/pifinder/PiFinder/switch-ap.sh")
+    Network.set_client_priority("0")
+    Network.set_ap_priority("1")
+    try :
+        with open(f"{utils.pifinder_dir}/wifi_status.txt", 'w') as f:
+            logger.info("Set AP")
+            f.write("AP")
+    except Exception:            
+        logger.info("File open error : " + f"{utils.pifinder_dir}/wifi_status.txt")
+    time.sleep(1)
     return True
 
 
 def go_wifi_cli():
     logger.info("SYS: Switching to Client")
-    sh.sudo("/home/pifinder/PiFinder/switch-cli.sh")
+    Network.set_client_priority("1")
+    Network.set_ap_priority("0")
+    try :
+        with open(f"{utils.pifinder_dir}/wifi_status.txt", 'w') as f:
+            logger.info("Set Client")
+            f.write("Client")
+    except Exception:            
+        logger.info("File open error : " + f"{utils.pifinder_dir}/wifi_status.txt")
+    time.sleep(1)
     return True
 
 
@@ -243,7 +435,7 @@ def restore_userdata(zip_path):
     restores userdata
     OVERWRITES existing data!
     """
-    unzip("-d", "/", "-o", zip_path)
+    sh.unzip("-d", "/", "-o", zip_path)
 
 
 def restart_pifinder() -> None:
@@ -277,7 +469,7 @@ def update_software():
     service
     """
     logger.info("SYS: Running update")
-    sh.bash("/home/pifinder/PiFinder/pifinder_update.sh")
+    sh.bash("/home/pifinder/PiFinder5/pifinder_update.sh")
     return True
 
 
@@ -286,7 +478,7 @@ def verify_password(username, password):
     Checks the provided password against the provided user
     password
     """
-    result = su(username, "-c", "echo", _in=f"{password}\n", _ok_code=(0, 1))
+    result = sh.su(username, "-c", "echo", _in=f"{password}\n", _ok_code=(0, 1))
     if result.exit_code == 0:
         return True
     else:
@@ -297,7 +489,7 @@ def change_password(username, current_password, new_password):
     """
     Changes the PiFinder User password
     """
-    result = passwd(
+    result = sh.passwd(
         username,
         _in=f"{current_password}\n{new_password}\n{new_password}\n",
         _ok_code=(0, 10),
@@ -322,3 +514,34 @@ def switch_cam_imx296() -> None:
 def switch_cam_imx462() -> None:
     logger.info("SYS: Switching cam to imx462")
     sh.sudo("python", "-m", "PiFinder.switch_camera", "imx462")
+
+def is_mountcontrol_active() -> bool:
+    """
+    Returns True if mount control service is active
+    """
+    status = sh.sudo("systemctl", "is-active", "indiwebmanager.service", _ok_code=(0, 3))
+    if status.exit_code == 0:
+        return True
+    else:
+        return False
+    
+def mountcontrol_activate() -> None:
+    """
+    Activates the mount control service
+    """
+    logger.info("SYS: Activating Mount Control")
+    sh.sudo("systemctl", "enable", "--now", "indiwebmanager.service")
+    # sh.sudo("systemctl", "start", "indiwebmanager.service")
+    # We need to start the mount control process during startup, so reboot
+    sh.sudo("shutdown", "-r", "now")
+
+
+def mountcontrol_deactivate() -> None:
+    """
+    Deactivates the mount control service
+    """
+    logger.info("SYS: Deactivating Mount Control")
+    sh.sudo("systemctl", "disable", "--now", "indiwebmanager.service")
+    # sh.sudo("systemctl", "stop", "indiwebmanager.service")
+    # We do NOT need to start the mount control process during startup, so reboot
+    sh.sudo("shutdown", "-r", "now")

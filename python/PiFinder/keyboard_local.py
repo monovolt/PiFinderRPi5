@@ -9,13 +9,13 @@ logger = logging.getLogger("Keyboard.Local")
 class KeyboardLocal(KeyboardInterface):
     """'
     Keyboard used with `python -m PiFinder.main -k local`
-
+pif
     PyHotKey does not support key combinations, so we map single keys to combination of button presses here.
 
     In addition to the arrow keys (LEFT, UP, DOWN, RIGHT), the following keys are mapped on an english keyboard layout:
     (Note that in other locales, the position of the keys may differ, but the meaning is the same)
-
-       0   1   2   3   4   5   6   7   8   9     <-- number keys
+  +
+   z    0   1   2   3   4   5   6   7   8   9     <-- number keys
         q   w   e   r   .   .   .   i   .   .
          a   s   d   f   g   .   j   k   l
           z   .   .   .   .   .   m   .   .   .
@@ -86,7 +86,7 @@ class KeyboardLocal(KeyboardInterface):
 
     def callback(self, key):
         self.q.put(key)
-
+        logger.debug(key)
 
 def run_keyboard(q, shared_state, log_queue, bloom_remap=False):
     MultiprocLogging.configurer(log_queue)

@@ -71,8 +71,8 @@ grep -q "dtoverlay=uart3" /boot/config.txt || \
 sudo systemctl disable ModemManager
 
 # Enable service
-sudo cp /home/pifinder/PiFinder/pi_config_files/pifinder.service /lib/systemd/system/pifinder.service
-sudo cp /home/pifinder/PiFinder/pi_config_files/pifinder_splash.service /lib/systemd/system/pifinder_splash.service
+sudo cp /home/pifinder/PiFinder5/pi_config_files/pifinder.service /lib/systemd/system/pifinder.service
+sudo cp /home/pifinder/PiFinder5/pi_config_files/pifinder_splash.service /lib/systemd/system/pifinder_splash.service
 sudo systemctl daemon-reload
 sudo systemctl enable pifinder
 sudo systemctl enable pifinder_splash

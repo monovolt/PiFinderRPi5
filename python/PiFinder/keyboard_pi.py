@@ -8,6 +8,7 @@ and adds keys to the provided queue
 
 from time import sleep
 import libinput
+
 from PiFinder.keyboard_interface import KeyboardInterface
 import RPi.GPIO as GPIO
 import logging
@@ -78,6 +79,7 @@ class KeyboardPi(KeyboardInterface):
 
         # physical keyboard support init
         self.li_kb = libinput.LibInput(context_type=libinput.ContextType.UDEV)
+        #self.li_kb = libinput.LibInput.udev_create_context()
         self.li_kb.assign_seat("seat0")
 
     def get_keyboard_key(self) -> int:
