@@ -1,23 +1,53 @@
 #!/usr/bin/bash
-# This script installs the PiFinder software on a prepared Raspberry Pi OS.
+# Raspberry Pi OS bookworm required
+# This script installs the PiFinder5 software on a prepared Raspberry Pi OS.
 # See https://pifinder.readthedocs.io/en/release/software.html for more info.
 
+
+# Additional steps
+# python3 -m pip config set global.break-system-packages true
+# sudo apt remove python3-rpi.gpio 
+# sudo apt remove libexif-dev sudo apt remove ibavdevice-dev libavcodec-dev libavformat-dev libswresample-dev 
+# 
+# pip3.10 install rpi-lgpio
+# sudo apt install -y libcap-dev python3-picamera2
+# pip3.10 install picamera2
+# sudo vi /boot/firmware/config.txt
+# dtoverlay=pwm-2chan,pin=13,func=4
+# enable serial port using sudo raspi-config
+# sudo vi /boot/firmware/config.txt
+# enable_uart=1
+# dtoverlay=uart2
+# dtparam=uart2=on
+# dtoverlay=imx290,clock-frequency=74250000 #IMX462
+
+# sudo apt-get install gpsd gpsd-clients
+# sudo vi /etc/default/gpsd
+# # They need to be read/writeable, either by user gpsd or the group dialout.
+# DEVICES="/dev/ttyAMA2"
+# Other options you want to pass to gpsd
+# GPSD_OPTIONS="-n"
+# Automatically hot add/remove USB GPS devices via gpsdctl
+# USBAUTO="true"
+# Add dns=dnsmasq in /etc/NetworkManage/NetworkManager.conf
+
+               
 set -e
 
 cd ~pifinder/
 
 sudo apt-get install -y git python3-pip samba samba-common-bin dnsmasq hostapd dhcpd gpsd
 
-if [[ -d PiFinder/ ]]; then
-    cd PiFinder/ && git config pull.rebase false && git pull
+if [[ -d PiFinder5/ ]]; then
+    cd PiFinder5/ && git config pull.rebase false && git pull
 else
-    git clone --recursive --branch release https://github.com/brickbots/PiFinder.git
+    git clone --recursive --branch release https://github.com/testezt/PiFinder5.git
 fi
-cd ~/PiFinder/ && sudo pip install -r python/requirements.txt
+cd ~/PiFinder5/ && pip3 install -r python/requirements.txt
 
 # Setup GPSD
 sudo dpkg-reconfigure -plow gpsd
-sudo cp ~/PiFinder/pi_config_files/gpsd.conf /etc/default/gpsd
+sudo cp ~/PiFinder5/pi_config_files/gpsd.conf /etc/default/gpsd
 
 # data dirs
 [[ -d ~/PiFinder_data ]] || \
@@ -35,21 +65,21 @@ mkdir ~/PiFinder_data/logs
 find ~/PiFinder_data -type d -exec chmod 755 {} \;
 
 # Wifi config
-sudo cp ~/PiFinder/pi_config_files/dhcpcd.* /etc
-sudo cp ~/PiFinder/pi_config_files/dhcpcd.conf.sta /etc/dhcpcd.conf
-sudo cp ~/PiFinder/pi_config_files/dnsmasq.conf /etc/dnsmasq.conf
-sudo cp ~/PiFinder/pi_config_files/hostapd.conf /etc/hostapd/hostapd.conf
-echo -n "Client" > ~/PiFinder/wifi_status.txt
-sudo systemctl unmask hostapd
+#sudo cp ~/PiFinder5/pi_config_files/dhcpcd.* /etc
+#sudo cp ~/PiFinder5/pi_config_files/dhcpcd.conf.sta /etc/dhcpcd.conf
+#sudo cp ~/PiFinder5/pi_config_files/dnsmasq.conf /etc/dnsmasq.conf
+#sudo cp ~/PiFinder5/pi_config_files/hostapd.conf /etc/hostapd/hostapd.conf
+#echo -n "Client" > ~/PiFinder5/wifi_status.txt
+#sudo systemctl unmask hostapd
 
 # open permissisons on wpa_supplicant file so we can adjust network config
-sudo chmod 666 /etc/wpa_supplicant/wpa_supplicant.conf
+# sudo chmod 666 /etc/wpa_supplicant/wpa_supplicant.conf
 
 # Samba config
-sudo cp ~/PiFinder/pi_config_files/smb.conf /etc/samba/smb.conf
+sudo cp ~/PiFinder5/pi_config_files/smb.conf /etc/samba/smb.conf
 
 # Hipparcos catalog
-HIP_MAIN_DAT="/home/pifinder/PiFinder/astro_data/hip_main.dat"
+HIP_MAIN_DAT="/home/pifinder/PiFinder5/astro_data/hip_main.dat"
 if [[ ! -e $HIP_MAIN_DAT ]]; then
     wget -O $HIP_MAIN_DAT https://cdsarc.cds.unistra.fr/ftp/cats/I/239/hip_main.dat
 fi
@@ -65,7 +95,7 @@ grep -q "dtoverlay=pwm,pin=13,func=4" /boot/config.txt || \
    echo "dtoverlay=pwm,pin=13,func=4" | sudo tee -a /boot/config.txt
 grep -q "dtoverlay=uart3" /boot/config.txt || \
    echo "dtoverlay=uart3" | sudo tee -a /boot/config.txt
-# Note: camera types are added lateron by python/PiFinder/switch_camera.py
+# Note: camera types are added lateron by python/PiFinder5/switch_camera.py
 
 # Disable unwanted services
 sudo systemctl disable ModemManager
@@ -78,4 +108,3 @@ sudo systemctl enable pifinder
 sudo systemctl enable pifinder_splash
 
 echo "PiFinder setup complete, please restart the Pi"
-
