@@ -69,6 +69,7 @@ display_hardware = "SSD1351"
 display_device: DisplayBase = DisplayBase()
 keypad_pwm = None
 previous_display_brightness = 0
+cfg = config.Config()
 
 # On/Off Switch GPIO
 on_off_swtich = 6
@@ -86,15 +87,16 @@ def init_on_off_switch():
 # On/Off switch callback
 def on_off_callback(channel):
     if GPIO.input(channel) == GPIO.HIGH:
-        print(f"Rising edge detected on GPIO {channel}")
+        logger.info(f"Rising edge detected on GPIO {channel}")
         on_light()
     else:
-        print(f"Falling edge detected on GPIO {channel}")
+        logger.info(f"Falling edge detected on GPIO {channel}")
         off_light()
 
 # Turn on the keyboard and dispaly to the orignal brightness
 def on_light() :
-    set_brightness(previous_display_brightness)
+    global previous_display_brightness, cfg
+    set_brightness(previous_display_brightness, cfg)
 
 # Turn off the keyboard and display
 def off_light() :
@@ -133,6 +135,7 @@ def set_brightness(level, cfg):
     0-255
     """
     if GPIO.input(on_off_swtich) == GPIO.HIGH :
+        global previous_display_brightness
         global display_device
         display_device.set_brightness(level)
         previous_display_brightness = level
@@ -289,7 +292,7 @@ def main(
     """
     Get this show on the road!
     """
-    global display_device, display_hardware
+    global display_device, display_hardware, cfg
 
     display_device = get_display(display_hardware)
     init_keypad_pwm()
@@ -338,8 +341,6 @@ def main(
     }
 
     init_on_off_switch()
-
-    cfg = config.Config()
 
     # init screen
     screen_brightness = cfg.get_option("display_brightness")
