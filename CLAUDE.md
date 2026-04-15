@@ -118,3 +118,65 @@ Tests use pytest with custom markers for different test types. The smoke tests p
 - **I18n Support:** Babel integration for multi-language UI
 
 The codebase follows modern Python practices with type hints, comprehensive testing, and automated code quality checks integrated into the development workflow.
+
+## RPi5 Fork - Key Differences from Upstream
+
+This is a fork of the original PiFinder (RPi4) adapted for Raspberry Pi 5 / Raspberry Pi OS Bookworm.
+
+**Repository:** `monovolt/PiFinderRPi5` (upstream: original PiFinder)
+**Install directory on Pi:** `~/PiFinder5/`
+
+### Raspberry Pi 5 Setup (Bookworm)
+
+**Installation path on Pi:**
+```bash
+# Run as pifinder user
+bash ~/PiFinder5/pifinder_setup.sh
+```
+
+**Service files use venv Python:**
+- `pi_config_files/pifinder.service` → ExecStart uses `/home/pifinder/PiFinder5/python/.venv/bin/python`
+
+**config.txt camera overlay (IMX462):**
+```
+dtoverlay=imx290,clock-frequency=74250000
+```
+Add under `[all]` section in `/boot/firmware/config.txt`.
+
+### tetra3 / Cedar-Detect Submodule
+
+Cedar-Detect runs as a **systemd service** (not spawned by PiFinder directly).
+
+`solver.py` connects via gRPC using `PFCedarDetectClient` on port 50551.
+
+`sys.path` in `solver.py` needs **two entries**:
+```python
+sys.path.append(str(utils.tetra3_dir))           # for `import tetra3`
+sys.path.append(str(utils.tetra3_dir / "tetra3")) # for `import cedar_detect_client`
+```
+
+`utils.tetra3_dir` points to `../python/PiFinder/tetra3` (submodule root, NOT `tetra3/tetra3`).
+
+If the submodule is not initialized:
+```bash
+git submodule update --init --recursive
+```
+
+### GPS Configuration
+
+- Default baud rate: 9600 (standard GPSD)
+- UBlox-10 supports 115200 — set via Settings > Advanced > GPS Settings > GPS Baud Rate
+- `gps_gpsd.py` uses synchronous streaming (asyncio removed)
+- Lock thresholds: `lock_at=6000`, `fix_2d=4000`, `fix_3d=1000` (ms)
+
+### Optional Dependencies
+
+- **PyIndi** (`mountcontrol_indi`): Only loaded when INDI mount control is active. Import is conditional in `main.py` — no startup error if not installed.
+
+### WiFi Management
+
+Uses **NetworkManager** (not wpa_supplicant) on Bookworm. `sys_utils.py` WiFi functions updated accordingly.
+
+### Known Pending Items
+
+- `sys_utils.py:47` `isAP()` is missing `@staticmethod` decorator
