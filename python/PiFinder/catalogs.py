@@ -753,7 +753,12 @@ class CometCatalog(TimerCatalog):
     def _start_background_init(self, dt):
         def init_task():
             while True:
-                success, self.age = comets.comet_data_download(comet_file)
+                need_download, reason = comets.check_if_comet_download_needed(comet_file)
+                if need_download:
+                    success, self.age, _ = comets.comet_data_download(comet_file)
+                else:
+                    success = True
+                    self.age = None
                 if success:
                     with self._init_lock:
                         self.initialized = self.calc_comet_first_time(dt)
