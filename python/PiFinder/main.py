@@ -39,7 +39,6 @@ from PiFinder import pos_server
 from PiFinder import utils
 from PiFinder import server
 from PiFinder import keyboard_interface
-from PiFinder import mountcontrol_indi
 
 from PiFinder.multiproclogging import MultiprocLogging
 from PiFinder.catalogs import CatalogBuilder, CatalogFilter, Catalogs
@@ -514,6 +513,7 @@ def main(
         # Mount Control
         sys_utils = utils.get_sys_utils()
         if sys_utils.is_mountcontrol_active():
+            from PiFinder import mountcontrol_indi
             console.write(_("  Mount Control"))
             logger.info(_("  Mount Control"))
             console.update()
