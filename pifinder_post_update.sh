@@ -1,5 +1,5 @@
 git submodule update --init --recursive
-sudo pip install -r /home/pifinder/PiFinder/python/requirements.txt
+sudo pip install -r /home/pifinder/PiFinder5/python/requirements.txt
 
 # Set up migrations folder if it does not exist
 if ! [ -d "/home/pifinder/PiFinder_data/migrations" ]
@@ -11,7 +11,7 @@ fi
 # everying prior to selecitve migrations
 if ! [ -f "/home/pifinder/PiFinder_data/migrations/v1.x.x" ]
 then
-    source /home/pifinder/PiFinder/migration_source/v1.x.x.sh
+    source /home/pifinder/PiFinder5/migration_source/v1.x.x.sh
     touch /home/pifinder/PiFinder_data/migrations/v1.x.x
 fi
 
@@ -19,7 +19,7 @@ fi
 # Switch to Cedar
 if ! [ -f "/home/pifinder/PiFinder_data/migrations/v2.1.0" ]
 then
-    source /home/pifinder/PiFinder/migration_source/v2.1.0.sh
+    source /home/pifinder/PiFinder5/migration_source/v2.1.0.sh
     touch /home/pifinder/PiFinder_data/migrations/v2.1.0
 fi
 
@@ -27,7 +27,7 @@ fi
 # Install libinput
 if ! [ -f "/home/pifinder/PiFinder_data/migrations/v2.2.1" ]
 then
-    source /home/pifinder/PiFinder/migration_source/v2.2.1.sh
+    source /home/pifinder/PiFinder5/migration_source/v2.2.1.sh
     touch /home/pifinder/PiFinder_data/migrations/v2.2.1
 fi
 
@@ -35,7 +35,7 @@ fi
 # Enable host usb on usb-c port
 if ! [ -f "/home/pifinder/PiFinder_data/migrations/v2.2.2" ]
 then
-    source /home/pifinder/PiFinder/migration_source/v2.2.2.sh
+    source /home/pifinder/PiFinder5/migration_source/v2.2.2.sh
     touch /home/pifinder/PiFinder_data/migrations/v2.2.2
 fi
 

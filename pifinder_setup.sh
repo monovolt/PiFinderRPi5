@@ -41,7 +41,7 @@ sudo apt-get install -y git python3-pip samba samba-common-bin dnsmasq hostapd d
 if [[ -d PiFinder5/ ]]; then
     cd PiFinder5/ && git config pull.rebase false && git pull
 else
-    git clone --recursive --branch release https://github.com/testezt/PiFinder5.git
+    git clone --recursive --branch release https://github.com/monovolt/PiFinderRPi5.git PiFinder5
 fi
 cd ~/PiFinder5/ && pip3 install -r python/requirements.txt
 
