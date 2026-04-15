@@ -21,7 +21,8 @@ import threading
 from PiFinder import state_utils
 from PiFinder import utils
 
-sys.path.append(str(utils.tetra3_dir))
+sys.path.append(str(utils.tetra3_dir))           # for `import tetra3`
+sys.path.append(str(utils.tetra3_dir / "tetra3")) # for `import cedar_detect_client`
 import grpc
 import tetra3
 import cedar_detect_client
