@@ -43,7 +43,7 @@ if [[ -d PiFinder5/ ]]; then
 else
     git clone --recursive --branch release https://github.com/monovolt/PiFinderRPi5.git PiFinder5
 fi
-cd ~/PiFinder5/ && pip3 install -r python/requirements.txt
+cd ~/PiFinder5/python && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 
 # Setup GPSD
 sudo dpkg-reconfigure -plow gpsd
