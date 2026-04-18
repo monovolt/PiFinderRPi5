@@ -72,13 +72,16 @@ cfg = config.Config()
 
 # On/Off Switch GPIO
 on_off_swtich = 6
+gpio_available = False
 
 # On/Off switch interrupt setup
 def init_on_off_switch():
+    global gpio_available
     try:
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(on_off_swtich, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Example with pull-up
         GPIO.add_event_detect(on_off_swtich, GPIO.BOTH, callback=on_off_callback, bouncetime=200)
+        gpio_available = True
         logger.info("Started : On/Off Switch monitor..")
     except (KeyboardInterrupt, RuntimeError) as e:
         logger.warning(f"On/Off Switch monitor not available: {e}")
@@ -133,7 +136,7 @@ def set_brightness(level, cfg):
     Sets oled/keypad brightness
     0-255
     """
-    if GPIO.input(on_off_swtich) == GPIO.HIGH :
+    if not gpio_available or GPIO.input(on_off_swtich) == GPIO.HIGH :
         global previous_display_brightness
         global display_device
         display_device.set_brightness(level)
@@ -270,13 +273,13 @@ class PowerManager:
         return screen_off
 
     def wake_screen(self) -> None:
-        if GPIO.input(on_off_swtich) == GPIO.HIGH :
+        if not gpio_available or GPIO.input(on_off_swtich) == GPIO.HIGH :
             screen_brightness = self.cfg.get_option("display_brightness")
             set_brightness(screen_brightness, self.cfg)
             self.display_device.device.show()
 
     def sleep_screen(self):
-        if GPIO.input(on_off_swtich) == GPIO.HIGH :
+        if not gpio_available or GPIO.input(on_off_swtich) == GPIO.HIGH :
             screen_brightness = self.cfg.get_option("display_brightness")
             set_brightness(int(screen_brightness / 4), self.cfg)
             self.display_device.device.show()
@@ -560,7 +563,7 @@ def main(
         power_manager = PowerManager(cfg, shared_state, display_device)
 
         #On/Off switch
-        if GPIO.input(on_off_swtich) == GPIO.LOW :
+        if gpio_available and GPIO.input(on_off_swtich) == GPIO.LOW :
             logger.info("Off Display")
             off_light()
         else :
