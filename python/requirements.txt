@@ -1,3 +1,6 @@
+# NOTE: picamera2 must be installed via apt on RPi5/Bookworm:
+#   sudo apt install -y libcap-dev python3-picamera2
+# Then create venv with: python3 -m venv --system-site-packages .venv
 adafruit-blinka==8.12.0
 adafruit-circuitpython-bno055
 bottle==0.12.25
@@ -6,8 +9,8 @@ dataclasses_json==0.6.7
 gpsdclient==1.3.2
 grpcio==1.64.1
 json5==0.9.25
-luma.oled==3.12.0
-luma.lcd==2.11.0
+luma.oled==3.15.0
+luma.lcd==2.13.0
 pillow==10.4.0
 numpy==1.26.2
 pandas==1.5.3

@@ -2,6 +2,9 @@
 # Raspberry Pi OS bookworm required
 # This script installs the PiFinder5 software on a prepared Raspberry Pi OS.
 # See https://pifinder.readthedocs.io/en/release/software.html for more info.
+#
+# Fresh install (run as pifinder user):
+#   wget -O /tmp/pifinder_setup.sh https://raw.githubusercontent.com/monovolt/PiFinderRPi5/release/pifinder_setup.sh && bash /tmp/pifinder_setup.sh
 
 
 # Additional steps
@@ -36,14 +39,22 @@ set -e
 
 cd ~pifinder/
 
-sudo apt-get install -y git python3-pip samba samba-common-bin dnsmasq hostapd dhcpd gpsd
+sudo apt-get install -y git python3-pip samba samba-common-bin dnsmasq hostapd dhcpd gpsd \
+    libcap-dev python3-picamera2 python3-dev libatlas-base-dev
+
+# RPi5: remove RPi.GPIO (incompatible) and use rpi-lgpio instead
+sudo apt-get remove -y python3-rpi.gpio 2>/dev/null || true
 
 if [[ -d PiFinder5/ ]]; then
     cd PiFinder5/ && git config pull.rebase false && git pull
 else
     git clone --recursive --branch release https://github.com/monovolt/PiFinderRPi5.git PiFinder5
 fi
-cd ~/PiFinder5/python && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+cd ~/PiFinder5/python && python3 -m venv --system-site-packages .venv && source .venv/bin/activate && pip install -r requirements.txt
+# rpi-lgpio must be force-installed in venv so it shadows the apt version and provides RPi.GPIO for RPi5
+pip install --force-reinstall rpi-lgpio
+# Remove any stale user-local RPi.GPIO that would override rpi-lgpio
+rm -rf ~/.local/lib/python3.*/site-packages/RPi/GPIO ~/.local/lib/python3.*/site-packages/RPi.GPIO-*.dist-info 2>/dev/null || true
 
 # Setup GPSD
 sudo dpkg-reconfigure -plow gpsd
