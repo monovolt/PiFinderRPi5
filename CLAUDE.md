@@ -147,7 +147,7 @@ Add under `[all]` section in `/boot/firmware/config.txt`.
 
 Cedar-Detect runs as a **systemd service** (not spawned by PiFinder directly).
 
-`solver.py` connects via gRPC using `PFCedarDetectClient` on port 50551.
+`solver.py` connects via gRPC using `PFCedarDetectClient` on port 50051.
 
 `sys.path` in `solver.py` needs **two entries**:
 ```python
