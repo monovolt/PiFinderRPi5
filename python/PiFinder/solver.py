@@ -31,11 +31,9 @@ logger = logging.getLogger("Solver")
 
 
 class PFCedarDetectClient(cedar_detect_client.CedarDetectClient):
-    def __init__(self, port=50551):
+    def __init__(self, port=50051):
         """Set up the client without spawning the server as we
         run this as a service on the PiFinder
-
-        Also changing this to a different default port
         """
         self._port = port
         time.sleep(2)
