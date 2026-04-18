@@ -80,8 +80,8 @@ def init_on_off_switch():
         GPIO.setup(on_off_swtich, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Example with pull-up
         GPIO.add_event_detect(on_off_swtich, GPIO.BOTH, callback=on_off_callback, bouncetime=200)
         logger.info("Started : On/Off Switch monitor..")
-    except KeyboardInterrupt:
-        logger.error("Failed : On/Off Switch monitor..")
+    except (KeyboardInterrupt, RuntimeError) as e:
+        logger.warning(f"On/Off Switch monitor not available: {e}")
 
 # On/Off switch callback
 def on_off_callback(channel):
