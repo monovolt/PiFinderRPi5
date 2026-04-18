@@ -1,0 +1,14 @@
+[Unit]
+Description=Cedar-Detect star detection gRPC server
+After=basic.target
+Before=pifinder.service
+
+[Service]
+Type=simple
+User=pifinder
+WorkingDirectory=/home/pifinder/PiFinder5
+ExecStart=/home/pifinder/PiFinder5/bin/cedar-detect-server-aarch64
+Restart=on-failure
+
+[Install]
+WantedBy=basic.target
