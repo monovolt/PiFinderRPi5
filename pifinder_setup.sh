@@ -95,17 +95,18 @@ if [[ ! -e $HIP_MAIN_DAT ]]; then
     wget -O $HIP_MAIN_DAT https://cdsarc.cds.unistra.fr/ftp/cats/I/239/hip_main.dat
 fi
 
-# Enable interfaces
-grep -q "dtparam=spi=on" /boot/config.txt || \
-   echo "dtparam=spi=on" | sudo tee -a /boot/config.txt
-grep -q "dtparam=i2c_arm=on" /boot/config.txt || \
-   echo "dtparam=i2c_arm=on" | sudo tee -a /boot/config.txt
-grep -q "dtparam=i2c_arm_baudrate=10000" /boot/config.txt || \
-   echo "dtparam=i2c_arm_baudrate=10000" | sudo tee -a /boot/config.txt
-grep -q "dtoverlay=pwm,pin=13,func=4" /boot/config.txt || \
-   echo "dtoverlay=pwm,pin=13,func=4" | sudo tee -a /boot/config.txt
-grep -q "dtoverlay=uart3" /boot/config.txt || \
-   echo "dtoverlay=uart3" | sudo tee -a /boot/config.txt
+# Enable interfaces (Bookworm: config is at /boot/firmware/config.txt)
+CONFIG_TXT="/boot/firmware/config.txt"
+grep -q "dtparam=spi=on" $CONFIG_TXT || \
+   echo "dtparam=spi=on" | sudo tee -a $CONFIG_TXT
+grep -q "dtparam=i2c_arm=on" $CONFIG_TXT || \
+   echo "dtparam=i2c_arm=on" | sudo tee -a $CONFIG_TXT
+grep -q "dtparam=i2c_arm_baudrate=10000" $CONFIG_TXT || \
+   echo "dtparam=i2c_arm_baudrate=10000" | sudo tee -a $CONFIG_TXT
+grep -q "dtoverlay=pwm-2chan" $CONFIG_TXT || \
+   echo "dtoverlay=pwm-2chan,pin=13,func=4" | sudo tee -a $CONFIG_TXT
+grep -q "dtoverlay=uart3" $CONFIG_TXT || \
+   echo "dtoverlay=uart3" | sudo tee -a $CONFIG_TXT
 # Note: camera types are added lateron by python/PiFinder5/switch_camera.py
 
 # Disable unwanted services
