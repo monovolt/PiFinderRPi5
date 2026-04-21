@@ -36,7 +36,8 @@
       "Bash(sed:*)",
       "Read(//Users/mike/dev/amateur_astro/myPiFinder/wt-steinicke/**)",
       "Bash(git:*)",
-      "Bash(gh auth *)"
+      "Bash(gh auth *)",
+      "Read(//d/workspace/PiFinder/python/PiFinder/**)"
     ],
     "deny": []
   }

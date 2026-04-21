@@ -180,12 +180,14 @@ def calc_comets(
         if sf_utils.observer_loc is None or dt is None:
             return comet_dict
 
+        # Report 0% at start (before slow file loading/processing)
         if progress_callback:
             progress_callback(0)
 
         with open(comet_file, "rb") as f:
             comets_df = mpc.load_comets_dataframe(f)
 
+        # Report progress after file loading (roughly 33% of setup time)
         if progress_callback:
             progress_callback(1)
 
@@ -196,6 +198,7 @@ def calc_comets(
             .set_index("designation", drop=False)
         )
 
+        # Report progress after pandas processing (roughly 66% of setup time)
         if progress_callback:
             progress_callback(2)
 
@@ -209,6 +212,7 @@ def calc_comets(
                 if result:
                     comet_dict[result["name"]] = result
 
+            # Report progress
             processed += 1
             if progress_callback and total_comets > 0:
                 progress = int((processed / total_comets) * 100)

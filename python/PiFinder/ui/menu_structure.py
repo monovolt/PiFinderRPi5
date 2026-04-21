@@ -10,7 +10,7 @@ from PiFinder.ui.chart import UIChart
 from PiFinder.ui.align import UIAlign
 from PiFinder.ui.textentry import UITextEntry
 from PiFinder.ui.preview import UIPreview
-#from PiFinder.ui.sqm import UISQM
+from PiFinder.ui.sqm import UISQM
 from PiFinder.ui.equipment import UIEquipment
 from PiFinder.ui.location_list import UILocationList
 from PiFinder.ui.radec_entry import UIRADecEntry
@@ -27,6 +27,7 @@ s = _("Language: en")
 s = _("Language: es")
 s = _("Language: fr")
 s = _("Language: ko")
+s = _("Language: zh")
 s = s
 del s
 
@@ -144,6 +145,12 @@ pifinder_menu = {
                                     "value": "EGC",
                                 },
                                 {
+                                    "name": _("Harris Globs"),
+                                    "class": UIObjectList,
+                                    "objects": "catalog",
+                                    "value": "Har",
+                                },
+                                {
                                     "name": _("Herschel 400"),
                                     "class": UIObjectList,
                                     "objects": "catalog",
@@ -216,12 +223,12 @@ pifinder_menu = {
                                     "objects": "catalog",
                                     "value": "RDS",
                                 },
-                                # {
-                                #    "name": _("WDS Doubles"),
-                                #    "class": UIObjectList,
-                                #    "objects": "catalog",
-                                #    "value": "WDS",
-                                # },
+                                {
+                                    "name": _("WDS Doubles"),
+                                    "class": UIObjectList,
+                                    "objects": "catalog",
+                                    "value": "WDS",
+                                },
                                 {
                                     "name": _("TLK 90 Variables"),
                                     "class": UIObjectList,
@@ -315,6 +322,10 @@ pifinder_menu = {
                                 {
                                     "name": _("E.G. Globs"),
                                     "value": "EGC",
+                                },
+                                {
+                                    "name": _("Harris Globs"),
+                                    "value": "Har",
                                 },
                                 {
                                     "name": _("Herschel 400"),
@@ -681,6 +692,22 @@ pifinder_menu = {
                             ],
                         },
                         {
+                            "name": _("T9 Search"),
+                            "class": UITextMenu,
+                            "select": "single",
+                            "config_option": "t9_search",
+                            "items": [
+                                {
+                                    "name": _("Off"),
+                                    "value": False,
+                                },
+                                {
+                                    "name": _("On"),
+                                    "value": True,
+                                },
+                            ],
+                        },
+                        {
                             "name": _("Az Arrows"),
                             "class": UITextMenu,
                             "select": "single",
@@ -723,6 +750,10 @@ pifinder_menu = {
                                 {
                                     "name": _("Spanish"),
                                     "value": "es",
+                                },
+                                {
+                                    "name": _("Chinese"),
+                                    "value": "zh",
                                 },
                             ],
                         },
@@ -837,6 +868,11 @@ pifinder_menu = {
                     "post_callback": callbacks.set_exposure,
                     "items": [
                         {
+                            "name": _("Auto"),
+                            "value": "auto",
+                            "name_suffix_callback": callbacks.get_camera_exposure_display,
+                        },
+                        {
                             "name": _("0.025s"),
                             "value": 25000,
                         },
@@ -896,7 +932,7 @@ pifinder_menu = {
                             "value": "Alt/Az",
                         },
                         {
-                            "name": _("Equitorial"),
+                            "name": _("Equatorial"),
                             "value": "EQ",
                         },
                     ],
@@ -1071,6 +1107,40 @@ pifinder_menu = {
                 {"name": _("Software Upd"), "class": UISoftware},
                 {"name": _("Test Mode"), "callback": callbacks.activate_debug},
                 {
+                    "name": _("Experimental"),
+                    "class": UITextMenu,
+                    "select": "Single",
+                    "items": [
+                        {"name": "SQM", "class": UISQM},
+                        {
+                            "name": _("AE Algo"),
+                            "class": UITextMenu,
+                            "select": "single",
+                            "config_option": "auto_exposure_zero_star_handler",
+                            "label": "auto_exp_zero_star_handler",
+                            "post_callback": callbacks.set_auto_exposure_zero_star_handler,
+                            "items": [
+                                {
+                                    "name": _("Sweep"),
+                                    "value": "sweep",
+                                },
+                                {
+                                    "name": _("Exponential"),
+                                    "value": "exponential",
+                                },
+                                {
+                                    "name": _("Reset to 0.4s"),
+                                    "value": "reset",
+                                },
+                                {
+                                    "name": _("Histogram"),
+                                    "value": "histogram",
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
                     "name": _("Power"),
                     "class": UITextMenu,
                     "select": "Single",
@@ -1105,7 +1175,8 @@ pifinder_menu = {
                     "name": _("Experimental"),
                     "class": UITextMenu,
                     "select": "Single",
-                    "items": [{
+                    "items": [
+                        {
                             "name": _("Mount Control"),
                             "class": UITextMenu,
                             "select": "Single",

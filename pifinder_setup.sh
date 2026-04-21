@@ -117,6 +117,7 @@ sudo cp /home/pifinder/PiFinder5/pi_config_files/pifinder.service /lib/systemd/s
 sudo cp /home/pifinder/PiFinder5/pi_config_files/pifinder_splash.service /lib/systemd/system/pifinder_splash.service
 sudo cp /home/pifinder/PiFinder5/pi_config_files/cedar-detect.service /lib/systemd/system/cedar-detect.service
 sudo systemctl daemon-reload
+sudo systemctl enable cedar_detect
 sudo systemctl enable pifinder
 sudo systemctl enable pifinder_splash
 sudo systemctl enable cedar-detect

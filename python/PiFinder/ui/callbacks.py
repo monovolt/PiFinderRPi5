@@ -76,9 +76,13 @@ def activate_debug(ui_module: UIModule) -> None:
 def set_exposure(ui_module: UIModule) -> None:
     """
     Sets exposure to current value in config option
+    Can be either a numeric value (microseconds) or "auto" for auto-exposure
     """
-    new_exposure: int = ui_module.config_object.get_option("camera_exp")
-    logger.info("Set exposure %f", new_exposure)
+    new_exposure = ui_module.config_object.get_option("camera_exp")
+    if new_exposure == "auto":
+        logger.info("Set exposure to auto mode")
+    else:
+        logger.info("Set exposure %f", new_exposure)
     ui_module.command_queues["camera"].put(f"set_exp:{new_exposure}")
 
 def set_auto_exposure_zero_star_handler(ui_module: UIModule) -> None:
@@ -107,6 +111,77 @@ def capture_exposure_sweep(ui_module: UIModule) -> None:
     ui_module.command_queues["camera"].put("capture_exp_sweep")
     ui_module.message(_("Capturing\nExp Sweep...\n~20 sec"), 3)
     ui_module.remove_from_stack()
+
+
+def get_camera_exposure_display(ui_module: UIModule) -> str:
+    """
+    Returns formatted current camera exposure for display.
+    Used to show current value when in auto-exposure mode.
+    """
+    config_exp = ui_module.config_object.get_option("camera_exp")
+
+    # For auto mode, get actual exposure from metadata
+    if config_exp == "auto":
+        try:
+            metadata = ui_module.shared_state.last_image_metadata()
+            if metadata and "exposure_time" in metadata:
+                actual_exp = metadata["exposure_time"]
+                exp_sec = actual_exp / 1_000_000
+                if exp_sec < 0.1:
+                    return f" ({int(exp_sec * 1000)}ms)"
+                else:
+                    return f" ({exp_sec:g}s)"
+        except Exception:
+            pass
+        return ""
+
+    # Format numeric exposure nicely for manual mode
+    if isinstance(config_exp, (int, float)):
+        exp_sec = config_exp / 1_000_000
+        if exp_sec < 0.1:
+            return f" ({int(exp_sec * 1000)}ms)"
+        else:
+            return f" ({exp_sec:g}s)"
+
+    return ""
+
+
+def set_auto_exposure_zero_star_handler(ui_module: UIModule) -> None:
+    """
+    Sets the zero-star handler plugin for auto-exposure.
+    Supports:
+      - "sweep": Systematic doubling sweep (25ms→1s, 2× ratio)
+      - "exponential": Logarithmic sweep (25ms→1s, 1.85× ratio, 7 steps)
+      - "reset": Quick reset to 0.4s default
+      - "histogram": Histogram-based adaptive with viable exposure selection
+    """
+    handler_type = ui_module.config_object.get_option("auto_exposure_zero_star_handler")
+    logger.info("Set auto-exposure zero-star handler to: %s", handler_type)
+    ui_module.command_queues["camera"].put(f"set_ae_handler:{handler_type}")
+
+
+def capture_exposure_sweep(ui_module: UIModule) -> None:
+    """
+    Captures 100 images at different exposures for PID testing/calibration.
+
+    Uses logarithmic spacing from 25ms to 1s for fine-grained analysis.
+    Images saved to: ~/PiFinder_data/captures/sweep_YYYYMMDD_HHMMSS/
+    Takes approximately 20 seconds to complete.
+
+    Shows real-time progress UI that monitors camera progress messages.
+    """
+    logger.info("Starting exposure sweep capture")
+
+    # Import the sweep UI module
+    from PiFinder.ui.exp_sweep import UIExpSweep
+
+    # Push the sweep progress UI onto the stack
+    # It will handle starting the sweep and showing progress
+    sweep_item = {
+        "class": UIExpSweep,
+        "label": "exp_sweep_progress",
+    }
+    ui_module.add_to_stack(sweep_item)
 
 
 def get_camera_exposure_display(ui_module: UIModule) -> str:
@@ -212,6 +287,9 @@ def switch_language(ui_module: UIModule) -> None:
     )
     lang.install()
     logger.info("Switch Language: %s", iso2_code)
+    if iso2_code == "zh":
+        # Chinese requires a new font, so we have to restart
+        restart_pifinder(ui_module)
 
 
 def go_wifi_ap(ui_module: UIModule) -> None:
@@ -392,8 +470,9 @@ def get_mountcontrol_status(ui_module: UIModule) -> list[str]:
     """
     status_str = "mountcontrol_off"
     if sys_utils.is_mountcontrol_active():
-         status_str = "mountcontrol_on"
+        status_str = "mountcontrol_on"
     return [status_str]
+
 
 def mountcontrol_activate(ui_module: UIModule) -> None:
     """
@@ -403,6 +482,7 @@ def mountcontrol_activate(ui_module: UIModule) -> None:
     sys_utils.mountcontrol_activate()
     restart_system(ui_module)
 
+
 def mountcontrol_deactivate(ui_module: UIModule) -> None:
     """
     Deactivates the mount control service
@@ -410,6 +490,7 @@ def mountcontrol_deactivate(ui_module: UIModule) -> None:
     ui_module.message(_("Deactivating\nMount Control"), 2)
     sys_utils.mountcontrol_deactivate()
     restart_system(ui_module)
+
 
 
 def update_gpsd_baud_rate(ui_module: UIModule) -> None:

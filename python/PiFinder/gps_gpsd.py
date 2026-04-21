@@ -60,7 +60,7 @@ def gps_main(gps_queue, console_queue, log_queue):
                     convert_datetime=True, filter=["TPV", "SKY"]
                 ):
                     if result["class"] == "TPV" and is_tpv_accurate(result):
-                        logger.info("last reading is %s", result)
+                        logger.debug("last reading is %s", result)
                         if (
                             result.get("lat")
                             and result.get("lon")
@@ -69,7 +69,7 @@ def gps_main(gps_queue, console_queue, log_queue):
                             if not gps_locked:
                                 gps_locked = True
                                 console_queue.put("GPS: Locked")
-                                logger.info("GPS locked")
+                                logger.debug("GPS locked")
 
                             if error_in_m < lock_at:
                                 lock_type = 0
@@ -90,16 +90,16 @@ def gps_main(gps_queue, console_queue, log_queue):
                                     "error_in_m": error_in_m,
                                 },
                             )
-                            logger.info("GPS fix: %s", msg)
+                            logger.debug("GPS fix: %s", msg)
                             gps_queue.put(msg)
 
                         if result.get("time"):
                             msg = ("time", result.get("time"))
-                            logger.info("Setting time to %s", result.get("time"))
+                            logger.debug("Setting time to %s", result.get("time"))
                             gps_queue.put(msg)
 
                     if result["class"] == "SKY":
-                        logger.info("GPS: SKY: %s", result)
+                        logger.debug("GPS: SKY: %s", result)
                         error_2d = result.get("hdop", 999)
                         error_3d = result.get("pdop", 999)
                         if "nSat" in result:
@@ -107,9 +107,8 @@ def gps_main(gps_queue, console_queue, log_queue):
                             sats_used = result["uSat"]
                             num_sats = (sats_seen, sats_used)
                             msg = ("satellites", num_sats)
-                            logger.info("Number of sats seen: %i", sats_seen)
+                            logger.debug("Number of sats seen: %i", sats_seen)
                             gps_queue.put(msg)
-
         except Exception as e:
             logger.error(f"Error in GPS monitor: {e}")
 

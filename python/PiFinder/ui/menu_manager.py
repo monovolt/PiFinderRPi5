@@ -169,6 +169,7 @@ class MenuManager:
         like chart, so they are ready to go
         """
         for module_def in collect_preloads():
+            print(f"Preloading: {module_def['class']}")
             module_def["state"] = module_def["class"](
                 display_class=self.display_class,
                 camera_image=self.camera_image,

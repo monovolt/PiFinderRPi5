@@ -542,7 +542,7 @@ def check_and_sync_gpsd_config(baud_rate: int) -> bool:
             expected_options = 'GPSD_OPTIONS=""'
 
         # Check if update is needed
-        current_match = re.search(r'^GPSD_OPTIONS=.*$', content, re.MULTILINE)
+        current_match = re.search(r"^GPSD_OPTIONS=.*$", content, re.MULTILINE)
         if current_match:
             current_options = current_match.group(0)
             if current_options == expected_options:
@@ -603,6 +603,7 @@ def update_gpsd_config(baud_rate: int) -> None:
         raise
 
 
+
 def is_mountcontrol_active() -> bool:
     """
     Returns True if mount control service is active
@@ -612,15 +613,14 @@ def is_mountcontrol_active() -> bool:
         return True
     else:
         return False
-    
+
+
 def mountcontrol_activate() -> None:
     """
     Activates the mount control service
     """
     logger.info("SYS: Activating Mount Control")
     sh.sudo("systemctl", "enable", "--now", "indiwebmanager.service")
-    # sh.sudo("systemctl", "start", "indiwebmanager.service")
-    # We need to start the mount control process during startup, so reboot
     sh.sudo("shutdown", "-r", "now")
 
 
@@ -630,6 +630,4 @@ def mountcontrol_deactivate() -> None:
     """
     logger.info("SYS: Deactivating Mount Control")
     sh.sudo("systemctl", "disable", "--now", "indiwebmanager.service")
-    # sh.sudo("systemctl", "stop", "indiwebmanager.service")
-    # We do NOT need to start the mount control process during startup, so reboot
     sh.sudo("shutdown", "-r", "now")
