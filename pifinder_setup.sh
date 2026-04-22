@@ -39,7 +39,7 @@ set -e
 
 cd ~pifinder/
 
-sudo apt-get install -y git python3-pip samba samba-common-bin dnsmasq hostapd dhcpd gpsd \
+sudo apt-get install -y git python3-pip samba samba-common-bin dnsmasq hostapd gpsd \
     libcap-dev python3-picamera2 python3-dev libatlas-base-dev
 
 # RPi5: remove RPi.GPIO (incompatible) and use rpi-lgpio instead
@@ -117,7 +117,6 @@ sudo cp /home/pifinder/PiFinder5/pi_config_files/pifinder.service /lib/systemd/s
 sudo cp /home/pifinder/PiFinder5/pi_config_files/pifinder_splash.service /lib/systemd/system/pifinder_splash.service
 sudo cp /home/pifinder/PiFinder5/pi_config_files/cedar-detect.service /lib/systemd/system/cedar-detect.service
 sudo systemctl daemon-reload
-sudo systemctl enable cedar_detect
 sudo systemctl enable pifinder
 sudo systemctl enable pifinder_splash
 sudo systemctl enable cedar-detect
