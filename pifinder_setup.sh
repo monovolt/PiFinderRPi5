@@ -121,4 +121,4 @@ sudo systemctl enable pifinder
 sudo systemctl enable pifinder_splash
 sudo systemctl enable cedar-detect
 
-echo "PiFinder setup complete, please restart the Pi"
+echo "PiFinder setup complete, please restart the Pi www"
