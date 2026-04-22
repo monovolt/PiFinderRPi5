@@ -50,11 +50,11 @@ except Exception as e:
     traceback.print_exc()
 
 # Step 3: luma SSD1351 init
-print("\n[3] Initializing SSD1351 via luma (10 MHz, BGR)...")
+print("\n[3] Initializing SSD1351 via luma (8 MHz, BGR)...")
 try:
     from luma.core.interface.serial import spi as luma_spi
     from luma.oled.device import ssd1351
-    serial = luma_spi(device=SPI_DEVICE, port=SPI_PORT, bus_speed_hz=10_000_000)
+    serial = luma_spi(device=SPI_DEVICE, port=SPI_PORT, bus_speed_hz=8_000_000)
     device = ssd1351(serial, rotate=0, bgr=True)
     print("    OK - SSD1351 initialized")
 except Exception as e:
