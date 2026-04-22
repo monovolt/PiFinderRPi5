@@ -1,4 +1,5 @@
 import functools
+import os
 from collections import namedtuple
 
 import numpy as np
@@ -10,6 +11,9 @@ from luma.oled.device import ssd1351
 from luma.lcd.device import st7789
 
 from PiFinder.ui.fonts import Fonts
+
+# RPi5 (RP1 chip) exposes SPI as port 10 instead of port 0
+_SPI_PORT = 10 if os.path.exists("/dev/spidev10.0") and not os.path.exists("/dev/spidev0.0") else 0
 
 
 ColorMask = namedtuple("ColorMask", ["mask", "mode"])
@@ -108,7 +112,7 @@ class DisplaySSD1351(DisplayBase):
 
     def __init__(self):
         # init display  (SPI hardware)
-        serial = spi(device=0, port=0, bus_speed_hz=40000000)
+        serial = spi(device=0, port=_SPI_PORT, bus_speed_hz=40000000)
         device_serial = ssd1351(serial, rotate=0, bgr=True)
 
         device_serial.capabilities(
@@ -130,7 +134,7 @@ class DisplayST7789_128(DisplayBase):
 
     def __init__(self):
         # init display  (SPI hardware)
-        serial = spi(device=0, port=0, bus_speed_hz=52000000)
+        serial = spi(device=0, port=_SPI_PORT, bus_speed_hz=52000000)
         device_serial = st7789(serial, bgr=True)
 
         device_serial.capabilities(
@@ -151,7 +155,7 @@ class DisplayST7789(DisplayBase):
 
     def __init__(self):
         # init display  (SPI hardware)
-        serial = spi(device=0, port=0, bus_speed_hz=52000000)
+        serial = spi(device=0, port=_SPI_PORT, bus_speed_hz=52000000)
         device_serial = st7789(serial, bgr=True)
 
         device_serial.capabilities(
