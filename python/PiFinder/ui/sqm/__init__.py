@@ -11,10 +11,14 @@ from .sqm import SQM
 from .noise_floor import NoiseFloorEstimator
 from .camera_profiles import get_camera_profile, detect_camera_type, CameraProfile
 
+# UISQM lives in sqm_ui; re-export so `from PiFinder.ui.sqm import UISQM` works
+from PiFinder.ui.sqm_ui import UISQM
+
 __all__ = [
     "SQM",
     "NoiseFloorEstimator",
     "get_camera_profile",
     "detect_camera_type",
     "CameraProfile",
+    "UISQM",
 ]
