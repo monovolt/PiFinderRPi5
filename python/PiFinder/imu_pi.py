@@ -193,7 +193,6 @@ def imu_monitor(shared_state, console_queue, log_queue):
 
         imu = ImuFake()
 
-    imu = Imu()
     imu_calibrated = False
     imu_data = {
         "moving": False,
