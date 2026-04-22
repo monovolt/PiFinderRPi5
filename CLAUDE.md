@@ -165,9 +165,44 @@ git submodule update --init --recursive
 ### GPS Configuration
 
 - Default baud rate: 9600 (standard GPSD)
-- UBlox-10 supports 115200 — set via Settings > Advanced > GPS Settings > GPS Baud Rate
+- UBlox-10 supports 115200 — set via **Settings > Advanced > GPS Settings > GPS Baud Rate** (do NOT edit `/etc/default/gpsd` directly — PiFinder overwrites it at startup)
 - `gps_gpsd.py` uses synchronous streaming (asyncio removed)
 - Lock thresholds: `lock_at=6000`, `fix_2d=4000`, `fix_3d=1000` (ms)
+- GPS device: `/dev/ttyAMA2` (uart2 overlay, GPIO4=TXD2, GPIO5=RXD2)
+
+### RPi5 UART vs SPI Pin Conflict (Critical)
+
+On RPi5 (RP1 chip), UART overlay GPIO assignments differ from RPi4:
+
+| Overlay | RPi4 GPIO | RPi5 GPIO | Device |
+|---------|-----------|-----------|--------|
+| uart2 | GPIO0/1 | **GPIO4/5** | /dev/ttyAMA2 |
+| uart3 | GPIO4/5 | **GPIO8/9** | /dev/ttyAMA3 |
+
+`dtoverlay=uart3` on RPi5 **steals SPI0 pins** (GPIO8=CE0, GPIO9=MISO) → SPI driver fails to initialize → OLED goes blank.
+
+**Fix**: Use `dtoverlay=uart2` (not uart3). The PiFinder v3 SMT board PCB traces GPS TX/RX to GPIO4/5.
+
+Verified working pin state after `dtoverlay=uart2`:
+```
+GPIO4:  TXD2  (GPS UART TX)
+GPIO5:  RXD2  (GPS UART RX)
+GPIO8:  output (SPI CE0, luma-controlled)
+GPIO9:  SPI0_MISO
+GPIO10: SPI0_MOSI
+GPIO11: SPI0_SCLK
+```
+
+### RPi5 Bookworm Fixes Applied
+
+| Issue | Root Cause | Fix |
+|-------|-----------|-----|
+| OLED blank | `uart3` conflicts with SPI on RPi5 | Changed to `uart2` in setup.sh |
+| IMU crash | Duplicate `imu = Imu()` in `imu_pi.py` line 196 | Removed duplicate call |
+| IMU AttributeError | `ImuFake` missing `calibration` attribute | Added `self.calibration = 0` |
+| UISQM ImportError | `ui/sqm/` directory shadowed `ui/sqm.py` | Renamed to `ui/sqm_ui.py` |
+| No `/dev/i2c-*` | Bookworm doesn't auto-load `i2c-dev` module | `modprobe i2c-dev` + `/etc/modules` |
+| SPI port | RPi5 RP1 chip exposes SPI as `/dev/spidev10.0` | Auto-detect in `displays.py` via `_SPI_PORT` |
 
 ### Optional Dependencies
 
