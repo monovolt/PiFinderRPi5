@@ -83,7 +83,7 @@ def test_raw(port, baud):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="GPS 테스트")
     parser.add_argument("--raw", action="store_true", help="Raw 시리얼 직접 읽기 (GPSD 우회)")
-    parser.add_argument("--port", default="/dev/ttyAMA10", help="시리얼 포트 (기본: /dev/ttyAMA10)")
+    parser.add_argument("--port", default="/dev/ttyAMA2", help="시리얼 포트 (기본: /dev/ttyAMA2)")
     parser.add_argument("--baud", type=int, default=115200, help="Baud rate (기본: 115200)")
     args = parser.parse_args()
 

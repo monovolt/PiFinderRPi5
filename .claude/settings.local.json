@@ -37,7 +37,8 @@
       "Read(//Users/mike/dev/amateur_astro/myPiFinder/wt-steinicke/**)",
       "Bash(git:*)",
       "Bash(gh auth *)",
-      "Read(//d/workspace/PiFinder/python/PiFinder/**)"
+      "Read(//d/workspace/PiFinder/python/PiFinder/**)",
+      "Bash(python3 -c \"import inspect; from luma.core.interface.serial import spi; print\\(inspect.signature\\(spi.__init__\\)\\)\")"
     ],
     "deny": []
   }

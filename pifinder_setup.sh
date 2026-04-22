@@ -118,7 +118,7 @@ grep -q "^i2c-dev" /etc/modules || echo "i2c-dev" | sudo tee -a /etc/modules
 sudo modprobe i2c-dev || true
 enable_config "dtparam=i2c_arm_baudrate=" "dtparam=i2c_arm_baudrate=10000"
 enable_config "dtoverlay=pwm-2chan" "dtoverlay=pwm-2chan,pin=13,func=4"
-enable_config "dtoverlay=uart3" "dtoverlay=uart3"
+enable_config "dtoverlay=uart2" "dtoverlay=uart2"
 # Note: camera types are added lateron by python/PiFinder5/switch_camera.py
 
 # Disable unwanted services
