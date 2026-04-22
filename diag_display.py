@@ -65,48 +65,79 @@ try:
 except Exception as e:
     print(f"    FAIL - {e}")
 
-# Step 4: try SSD1351 with each likely DC pin
-print("\n[4] Trying SSD1351 init with different DC pins (24, 25, 27)...")
+# Step 4: check available SPI devices
+print("\n[4] Available SPI devices...")
+spi_devs = sorted([f for f in os.listdir("/dev") if f.startswith("spidev")])
+for d in spi_devs:
+    print(f"    /dev/{d}")
+
+# Step 5: try all combinations of CS device and DC pin
+print("\n[5] Trying SSD1351 init — all CS/DC combinations...")
 from luma.core.interface.serial import spi as luma_spi
 from luma.oled.device import ssd1351
 from PIL import Image, ImageDraw
+import RPi.GPIO as GPIO
 
 device = None
 working_dc = None
+working_cs = None
 
-for dc_pin in [24, 25, 27]:
-    print(f"\n    --- DC=GPIO{dc_pin} ---")
+def try_rst(rst_pin):
     try:
-        serial = luma_spi(device=SPI_DEVICE, port=SPI_PORT,
-                          bus_speed_hz=8_000_000, gpio_DC=dc_pin)
-        dev = ssd1351(serial, rotate=0, bgr=True)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(rst_pin, GPIO.OUT)
+        GPIO.output(rst_pin, GPIO.LOW)
+        time.sleep(0.1)
+        GPIO.output(rst_pin, GPIO.HIGH)
+        time.sleep(0.1)
+    except Exception:
+        pass
 
-        # Draw a bright red screen and wait
-        img = Image.new("RGB", (128, 128), (255, 0, 0))
-        dev.display(img)
-        print(f"    OK - initialized with DC=GPIO{dc_pin}")
-        print(f"    >>> Does the OLED show RED now? (waiting 3s) <<<")
-        time.sleep(3)
+cs_devices = list(set([int(d.split(".")[1]) for d in spi_devs if d.startswith(f"spidev{SPI_PORT}.")]))
+dc_pins = [24, 25, 27]
+rst_pins = [25, 27, 24]
 
-        answer = input(f"    Did you see RED on the OLED? [y/n]: ").strip().lower()
-        if answer == "y":
-            device = dev
-            working_dc = dc_pin
-            print(f"    ✓ Working DC pin found: GPIO{dc_pin}")
-            break
-        else:
-            serial.cleanup()
-    except Exception as e:
-        print(f"    FAIL - {e!r}")
-        traceback.print_exc()
+for cs in cs_devices:
+    for dc_pin in dc_pins:
+        rst_pin = next((p for p in rst_pins if p != dc_pin), 25)
+        print(f"\n    --- CS=CE{cs}  DC=GPIO{dc_pin}  RST=GPIO{rst_pin} ---")
+        try:
+            try_rst(rst_pin)
+            serial = luma_spi(device=cs, port=SPI_PORT,
+                              bus_speed_hz=8_000_000, gpio_DC=dc_pin, gpio_RST=rst_pin)
+            dev = ssd1351(serial, rotate=0, bgr=True)
+            img = Image.new("RGB", (128, 128), (255, 0, 0))
+            dev.display(img)
+            print(f"    OK - initialized")
+            print(f"    >>> OLED RED? (waiting 3s) <<<")
+            time.sleep(3)
+            answer = input(f"    Did you see RED? [y/n]: ").strip().lower()
+            if answer == "y":
+                device = dev
+                working_dc = dc_pin
+                working_cs = cs
+                print(f"    ✓ FOUND: CS=CE{cs} DC=GPIO{dc_pin} RST=GPIO{rst_pin}")
+                break
+            else:
+                try:
+                    serial.cleanup()
+                except Exception:
+                    pass
+        except Exception as e:
+            print(f"    FAIL - {e!r}")
+    if device:
+        break
 
 if device is None:
-    print("\n=== RESULT: No DC pin worked — check wiring ===")
-    print("Verify: MOSI=GPIO10, SCLK=GPIO11, CS=GPIO8(CE0), VCC=3.3V, GND")
+    print("\n=== RESULT: No combination worked ===")
+    print("Hardware check needed:")
+    print("  - Measure VCC pin on OLED (should be 3.3V)")
+    print("  - Run: pinctrl get 7 8 9 10 11  (verify SPI pin modes)")
+    print("  - Check OLED CS wire goes to GPIO8 (CE0) or GPIO7 (CE1)")
     sys.exit(1)
 
-# Step 5: full color test
-print(f"\n[5] Drawing test pattern with DC=GPIO{working_dc}...")
+# Step 6: full color test
+print(f"\n[6] Drawing test pattern with CS=CE{working_cs} DC=GPIO{working_dc}...")
 colors = [
     ("Red",   (255,   0,   0)),
     ("Green", (  0, 255,   0)),
@@ -119,16 +150,16 @@ for name, rgb in colors:
     print(f"    {name} {rgb} - displayed")
     time.sleep(1)
 
-# Step 6: text
-print("\n[6] Drawing text overlay...")
+# Step 7: text
+print("\n[7] Drawing text overlay...")
 img = Image.new("RGB", (128, 128), (0, 0, 0))
 draw = ImageDraw.Draw(img)
 draw.rectangle([0, 0, 127, 127], outline=(255, 255, 0))
 draw.text((10, 50), "PiFinder", fill=(255, 255, 0))
-draw.text((10, 65), f"DC=GPIO{working_dc}", fill=(0, 255, 0))
+draw.text((10, 65), f"CS={working_cs} DC={working_dc}", fill=(0, 255, 0))
 device.display(img)
 print("    Text drawn")
 
 print(f"\n=== Diagnostic complete ===")
-print(f"Working DC pin: GPIO{working_dc}")
-print(f"Update displays.py: spi(..., gpio_DC={working_dc})")
+print(f"Working config: CS=CE{working_cs}, DC=GPIO{working_dc}")
+print(f"Update displays.py: spi(device={working_cs}, port=_SPI_PORT, bus_speed_hz=40000000, gpio_DC={working_dc})")
