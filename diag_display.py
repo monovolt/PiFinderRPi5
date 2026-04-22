@@ -35,7 +35,7 @@ except Exception as e:
     print(f"    FAIL - {e}")
     sys.exit(1)
 
-# Step 2: GPIO test (DC pin = GPIO 24)
+# Step 2: GPIO test (DC pin = GPIO 24) — no cleanup so luma can reuse GPIO
 print("\n[2] Testing GPIO (DC pin = GPIO 24)...")
 try:
     import RPi.GPIO as GPIO
@@ -43,10 +43,11 @@ try:
     GPIO.setup(24, GPIO.OUT)
     GPIO.output(24, GPIO.HIGH)
     GPIO.output(24, GPIO.LOW)
-    GPIO.cleanup()
-    print("    OK - GPIO 24 toggled successfully")
+    print("    OK - GPIO 24 toggled successfully (no cleanup, luma will reuse)")
 except Exception as e:
+    import traceback
     print(f"    FAIL - {e}")
+    traceback.print_exc()
 
 # Step 3: luma SSD1351 init
 print("\n[3] Initializing SSD1351 via luma (10 MHz, BGR)...")
@@ -57,7 +58,9 @@ try:
     device = ssd1351(serial, rotate=0, bgr=True)
     print("    OK - SSD1351 initialized")
 except Exception as e:
-    print(f"    FAIL - {e}")
+    import traceback
+    print(f"    FAIL - {e!r}")
+    traceback.print_exc()
     sys.exit(1)
 
 # Step 4: draw solid colors
