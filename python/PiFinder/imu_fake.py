@@ -24,7 +24,7 @@ class Imu:
     def __init__(self):
         self._moving = False
         self._flip = False
-        pass
+        self.calibration = 0
 
     def moving(self):
         """
