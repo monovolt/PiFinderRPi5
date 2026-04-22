@@ -56,9 +56,10 @@ pip install --force-reinstall rpi-lgpio
 # Remove any stale user-local RPi.GPIO that would override rpi-lgpio
 rm -rf ~/.local/lib/python3.*/site-packages/RPi/GPIO ~/.local/lib/python3.*/site-packages/RPi.GPIO-*.dist-info 2>/dev/null || true
 
-# Setup GPSD
-sudo dpkg-reconfigure -plow gpsd
+# Setup GPSD (non-interactive: copy config directly, skip dpkg-reconfigure)
 sudo cp ~/PiFinder5/pi_config_files/gpsd.conf /etc/default/gpsd
+sudo systemctl enable gpsd
+sudo systemctl restart gpsd || true
 
 # data dirs
 [[ -d ~/PiFinder_data ]] || \
@@ -127,5 +128,11 @@ sudo systemctl daemon-reload
 sudo systemctl enable pifinder
 sudo systemctl enable pifinder_splash
 sudo systemctl enable cedar-detect
+sudo systemctl start cedar-detect
 
-echo "PiFinder setup complete, please restart the Pi www"
+echo ""
+echo "PiFinder setup complete!"
+echo "Rebooting in 5 seconds to apply config.txt changes (SPI, I2C, UART)..."
+echo "Press Ctrl+C to cancel reboot."
+sleep 5
+sudo reboot
