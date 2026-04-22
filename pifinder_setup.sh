@@ -97,16 +97,23 @@ fi
 
 # Enable interfaces (Bookworm: config is at /boot/firmware/config.txt)
 CONFIG_TXT="/boot/firmware/config.txt"
-grep -q "dtparam=spi=on" $CONFIG_TXT || \
-   echo "dtparam=spi=on" | sudo tee -a $CONFIG_TXT
-grep -q "dtparam=i2c_arm=on" $CONFIG_TXT || \
-   echo "dtparam=i2c_arm=on" | sudo tee -a $CONFIG_TXT
-grep -q "dtparam=i2c_arm_baudrate=10000" $CONFIG_TXT || \
-   echo "dtparam=i2c_arm_baudrate=10000" | sudo tee -a $CONFIG_TXT
-grep -q "dtoverlay=pwm-2chan" $CONFIG_TXT || \
-   echo "dtoverlay=pwm-2chan,pin=13,func=4" | sudo tee -a $CONFIG_TXT
-grep -q "dtoverlay=uart3" $CONFIG_TXT || \
-   echo "dtoverlay=uart3" | sudo tee -a $CONFIG_TXT
+
+# Helper: uncomment if commented out, else append if missing entirely
+enable_config() {
+    local key="$1"
+    local line="$2"
+    if grep -q "^#${key}" $CONFIG_TXT; then
+        sudo sed -i "s|^#${key}.*|${line}|" $CONFIG_TXT
+    elif ! grep -q "^${key}" $CONFIG_TXT; then
+        echo "${line}" | sudo tee -a $CONFIG_TXT
+    fi
+}
+
+enable_config "dtparam=spi=on" "dtparam=spi=on"
+enable_config "dtparam=i2c_arm=on" "dtparam=i2c_arm=on"
+enable_config "dtparam=i2c_arm_baudrate=" "dtparam=i2c_arm_baudrate=10000"
+enable_config "dtoverlay=pwm-2chan" "dtoverlay=pwm-2chan,pin=13,func=4"
+enable_config "dtoverlay=uart3" "dtoverlay=uart3"
 # Note: camera types are added lateron by python/PiFinder5/switch_camera.py
 
 # Disable unwanted services
