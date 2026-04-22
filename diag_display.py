@@ -12,13 +12,15 @@ Usage:
 import os
 import sys
 import time
+import traceback
+import inspect
 
 # Detect SPI port (RPi5 uses port 10)
 SPI_PORT = 10 if os.path.exists("/dev/spidev10.0") and not os.path.exists("/dev/spidev0.0") else 0
 SPI_DEVICE = 0
 
-print(f"=== PiFinder OLED Display Diagnostic ===")
-print(f"SPI devices: {os.listdir('/dev') and [f for f in os.listdir('/dev') if 'spi' in f]}")
+print("=== PiFinder OLED Display Diagnostic ===")
+print(f"SPI devices: {[f for f in os.listdir('/dev') if 'spi' in f]}")
 print(f"Using: /dev/spidev{SPI_PORT}.{SPI_DEVICE}")
 
 # Step 1: raw SPI open
@@ -33,63 +35,100 @@ try:
     print("    OK - SPI device opened and write succeeded")
 except Exception as e:
     print(f"    FAIL - {e}")
+    traceback.print_exc()
     sys.exit(1)
 
-# Step 2: GPIO test (DC pin = GPIO 24) — no cleanup so luma can reuse GPIO
-print("\n[2] Testing GPIO (DC pin = GPIO 24)...")
+# Step 2: GPIO test — no cleanup so luma can reuse
+print("\n[2] Testing GPIO pins...")
 try:
     import RPi.GPIO as GPIO
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(24, GPIO.OUT)
-    GPIO.output(24, GPIO.HIGH)
-    GPIO.output(24, GPIO.LOW)
-    print("    OK - GPIO 24 toggled successfully (no cleanup, luma will reuse)")
+    for pin in [24, 25, 27]:
+        GPIO.setup(pin, GPIO.OUT)
+        GPIO.output(pin, GPIO.HIGH)
+        GPIO.output(pin, GPIO.LOW)
+        print(f"    GPIO {pin} - toggled OK")
+    print("    (no cleanup — luma will reuse)")
 except Exception as e:
-    import traceback
     print(f"    FAIL - {e}")
     traceback.print_exc()
 
-# Step 3: luma SSD1351 init
-print("\n[3] Initializing SSD1351 via luma (8 MHz, BGR)...")
+# Step 3: luma spi() default DC/RST pins
+print("\n[3] Checking luma spi() default DC/RST pin numbers...")
 try:
     from luma.core.interface.serial import spi as luma_spi
-    from luma.oled.device import ssd1351
-    serial = luma_spi(device=SPI_DEVICE, port=SPI_PORT, bus_speed_hz=8_000_000)
-    device = ssd1351(serial, rotate=0, bgr=True)
-    print("    OK - SSD1351 initialized")
+    sig = inspect.signature(luma_spi.__init__)
+    dc  = sig.parameters.get("gpio_DC",  sig.parameters.get("dc",  None))
+    rst = sig.parameters.get("gpio_RST", sig.parameters.get("rst", None))
+    print(f"    luma default DC  pin: {dc.default  if dc  else 'unknown'}")
+    print(f"    luma default RST pin: {rst.default if rst else 'unknown'}")
 except Exception as e:
-    import traceback
-    print(f"    FAIL - {e!r}")
-    traceback.print_exc()
+    print(f"    FAIL - {e}")
+
+# Step 4: try SSD1351 with each likely DC pin
+print("\n[4] Trying SSD1351 init with different DC pins (24, 25, 27)...")
+from luma.core.interface.serial import spi as luma_spi
+from luma.oled.device import ssd1351
+from PIL import Image, ImageDraw
+
+device = None
+working_dc = None
+
+for dc_pin in [24, 25, 27]:
+    print(f"\n    --- DC=GPIO{dc_pin} ---")
+    try:
+        serial = luma_spi(device=SPI_DEVICE, port=SPI_PORT,
+                          bus_speed_hz=8_000_000, gpio_DC=dc_pin)
+        dev = ssd1351(serial, rotate=0, bgr=True)
+
+        # Draw a bright red screen and wait
+        img = Image.new("RGB", (128, 128), (255, 0, 0))
+        dev.display(img)
+        print(f"    OK - initialized with DC=GPIO{dc_pin}")
+        print(f"    >>> Does the OLED show RED now? (waiting 3s) <<<")
+        time.sleep(3)
+
+        answer = input(f"    Did you see RED on the OLED? [y/n]: ").strip().lower()
+        if answer == "y":
+            device = dev
+            working_dc = dc_pin
+            print(f"    ✓ Working DC pin found: GPIO{dc_pin}")
+            break
+        else:
+            serial.cleanup()
+    except Exception as e:
+        print(f"    FAIL - {e!r}")
+        traceback.print_exc()
+
+if device is None:
+    print("\n=== RESULT: No DC pin worked — check wiring ===")
+    print("Verify: MOSI=GPIO10, SCLK=GPIO11, CS=GPIO8(CE0), VCC=3.3V, GND")
     sys.exit(1)
 
-# Step 4: draw solid colors
-print("\n[4] Drawing test pattern (red → green → blue → white, 1s each)...")
-from PIL import Image, ImageDraw, ImageFont
-
+# Step 5: full color test
+print(f"\n[5] Drawing test pattern with DC=GPIO{working_dc}...")
 colors = [
     ("Red",   (255,   0,   0)),
     ("Green", (  0, 255,   0)),
     ("Blue",  (  0,   0, 255)),
     ("White", (255, 255, 255)),
 ]
-
 for name, rgb in colors:
     img = Image.new("RGB", (128, 128), rgb)
     device.display(img)
     print(f"    {name} {rgb} - displayed")
     time.sleep(1)
 
-# Step 5: text overlay
-print("\n[5] Drawing text overlay...")
+# Step 6: text
+print("\n[6] Drawing text overlay...")
 img = Image.new("RGB", (128, 128), (0, 0, 0))
 draw = ImageDraw.Draw(img)
 draw.rectangle([0, 0, 127, 127], outline=(255, 255, 0))
 draw.text((10, 50), "PiFinder", fill=(255, 255, 0))
-draw.text((10, 65), "RPi5 OK", fill=(0, 255, 0))
+draw.text((10, 65), f"DC=GPIO{working_dc}", fill=(0, 255, 0))
 device.display(img)
-print("    Text drawn - check OLED for yellow text on black background")
+print("    Text drawn")
 
-print("\n=== Diagnostic complete ===")
-print("If OLED showed colors and text, the display is working correctly.")
-print("If OLED stayed blank, check wiring: MOSI, SCLK, CS, DC (GPIO24), RST (GPIO25), VCC, GND")
+print(f"\n=== Diagnostic complete ===")
+print(f"Working DC pin: GPIO{working_dc}")
+print(f"Update displays.py: spi(..., gpio_DC={working_dc})")
