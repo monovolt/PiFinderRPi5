@@ -112,6 +112,10 @@ enable_config() {
 
 enable_config "dtparam=spi=on" "dtparam=spi=on"
 enable_config "dtparam=i2c_arm=on" "dtparam=i2c_arm=on"
+
+# RPi5/Bookworm: i2c-dev module must be explicitly loaded for /dev/i2c-* nodes
+grep -q "^i2c-dev" /etc/modules || echo "i2c-dev" | sudo tee -a /etc/modules
+sudo modprobe i2c-dev || true
 enable_config "dtparam=i2c_arm_baudrate=" "dtparam=i2c_arm_baudrate=10000"
 enable_config "dtoverlay=pwm-2chan" "dtoverlay=pwm-2chan,pin=13,func=4"
 enable_config "dtoverlay=uart3" "dtoverlay=uart3"
