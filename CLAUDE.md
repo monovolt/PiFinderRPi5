@@ -203,6 +203,28 @@ GPIO11: SPI0_SCLK
 | UISQM ImportError | `ui/sqm/` directory shadowed `ui/sqm.py` | Renamed to `ui/sqm_ui.py` |
 | No `/dev/i2c-*` | Bookworm doesn't auto-load `i2c-dev` module | `modprobe i2c-dev` + `/etc/modules` |
 | SPI port | RPi5 RP1 chip exposes SPI as `/dev/spidev10.0` | Auto-detect in `displays.py` via `_SPI_PORT` |
+| Camera white screen (IMX462) | RPi5 PiSP raw format left-alignment (see below) | `raw_bit_shift=4` + `bias_offset=240` in camera profile |
+
+### RPi5 PiSP Camera Raw Format (IMX462 White Screen Fix)
+
+**Symptom:** Focus screen shows entirely white/bright image even at night. Stars barely visible. Plate solving fails.
+
+**Root cause:** On RPi5, the PiSP camera pipeline stores 12-bit sensor values **left-aligned** in 16-bit words (SRGGB12_1X12 → RG16 CFE format). Raw uint16 values are therefore 16× the actual sensor ADU values. The original code assumed right-aligned values, causing every pixel to calculate as 238–255/255 → all white.
+
+Confirmed via `diag_camera.py`:
+```
+Raw uint16: min=3632, max=5632, mean=3847  ← max > 4095 proves left-alignment
+12-bit ADU: min=227,  max=352,  mean=240   ← actual sensor values after >>4
+```
+
+**Fix applied** (`python/PiFinder/sqm/camera_profiles.py` + `python/PiFinder/camera_pi.py`):
+- Added `raw_bit_shift: int = 0` field to `CameraProfile` dataclass
+- Set `raw_bit_shift=4` for IMX462 and IMX290 profiles (16 − 12 = 4 bits)
+- Updated `bias_offset` from 50 → **240** ADU (measured actual dark-frame pedestal)
+- In `camera_pi.py` `capture()`: apply `raw_capture >> self.profile.raw_bit_shift` before scaling
+- Default `analog_gain` reduced from 30 → **10** (IMX462 STARVIS is extremely sensitive; 30× at 400ms causes overexposure)
+
+**Diagnostic tool:** `diag_camera.py` at repo root — captures dark frame and live frame, auto-detects left-aligned format, reports sensor health.
 
 ### Optional Dependencies
 
