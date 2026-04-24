@@ -49,23 +49,20 @@ def capture_raw(gain: float, exposure_us: int):
     raw = req.make_array("raw").copy().view(np.uint16)
     req.release()
     cam.stop()
+    cam.close()  # Must explicitly close to release hardware for next capture
     return raw, cam_id
 
 
-def normalize_to_12bit(arr: np.ndarray) -> tuple:
-    """Detect left-aligned bit packing and normalize to 12-bit range.
+def normalize_to_12bit(arr: np.ndarray, sensor_bits: int = 12) -> tuple:
+    """Normalize raw uint16 values to the sensor's native bit depth.
 
-    RPi5 PiSP pipeline stores 12-bit sensor values left-aligned in 16-bit words,
-    so raw uint16 values can exceed 4095. Shift right to normalize.
+    RPi5 PiSP pipeline stores N-bit sensor values left-aligned in 16-bit words.
+    The correct shift is always (16 - sensor_bits), e.g. 4 for 12-bit sensors.
     Returns (normalized_array, bit_shift_applied).
     """
-    if arr.max() > 4095:
-        shift = 0
-        tmp = arr
-        while tmp.max() > 4095:
-            shift += 1
-            tmp = arr >> shift
-        return tmp, shift
+    shift = 16 - sensor_bits  # e.g. 16-12=4 for SRGGB12 on RPi5
+    if shift > 0 and arr.max() > (2**sensor_bits - 1):
+        return arr >> shift, shift
     return arr, 0
 
 
