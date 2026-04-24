@@ -144,7 +144,7 @@ CAMERA_PROFILES: Dict[str, CameraProfile] = {
         # Hardware configuration
         format="SRGGB12",  # 12-bit Bayer format
         raw_size=(1920, 1080),
-        analog_gain=30.0,
+        analog_gain=10.0,  # STARVIS sensor is very sensitive; 30 (max) causes heavy overexposure
         digital_gain=1.0,  # TODO: find optimum value
         bit_depth=12,
         bias_offset=50.0,  # TODO: measure with dark frames
@@ -275,7 +275,8 @@ def detect_camera_type(hardware_id: str) -> str:
     # Mapping of hardware ID substrings to profile names
     hardware_mappings = {
         "imx296": "imx296",
-        "imx290": "imx462",  # IMX290 uses IMX462 profile (driver compatibility)
+        "imx462": "imx462",  # Direct IMX462 hardware ID
+        "imx290": "imx462",  # IMX290 driver is also used for IMX462 hardware
         "imx477": "hq",
     }
 

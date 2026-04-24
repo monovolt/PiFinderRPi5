@@ -267,6 +267,11 @@ def get_images(shared_state, camera_image, command_queue, console_queue, log_que
         exposure_time = 400000  # Start with default 400ms
 
     camera_hardware = CameraPI(exposure_time)
+
+    # Apply saved gain from config if present (overrides profile default)
+    saved_gain = cfg.get_option("camera_gain")
+    if saved_gain is not None:
+        camera_hardware.set_camera_config(camera_hardware.exposure_time, float(saved_gain))
     camera_hardware.get_image_loop(
         shared_state, camera_image, command_queue, console_queue, cfg
     )
