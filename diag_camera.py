@@ -16,9 +16,8 @@ import sys
 import time
 import numpy as np
 
-BIAS_OFFSET = 50  # IMX462 expected dark-frame mean (ADU)
-DARK_THRESHOLD = 500   # Mean ADU above which image is considered overexposed
-NOISE_THRESHOLD = 200  # Std-dev above which sensor is considered noisy
+DARK_THRESHOLD_12BIT = 500   # Mean ADU (12-bit) above which image is considered overexposed
+NOISE_THRESHOLD_12BIT = 50   # Std-dev (12-bit) above which sensor is considered noisy
 
 
 def capture_raw(gain: float, exposure_us: int):
@@ -53,22 +52,43 @@ def capture_raw(gain: float, exposure_us: int):
     return raw, cam_id
 
 
-def print_stats(label: str, arr: np.ndarray):
-    print(f"\n--- {label} ---")
-    print(f"  Shape : {arr.shape}")
-    print(f"  Min   : {arr.min()}")
-    print(f"  Max   : {arr.max()}")
-    print(f"  Mean  : {arr.mean():.1f}")
-    print(f"  Std   : {arr.std():.1f}")
+def normalize_to_12bit(arr: np.ndarray) -> tuple:
+    """Detect left-aligned bit packing and normalize to 12-bit range.
 
-    mean = arr.mean()
-    if mean < BIAS_OFFSET + 100:
-        verdict = "OK - sensor is dark (good for lens-cap test)"
-    elif mean < DARK_THRESHOLD:
+    RPi5 PiSP pipeline stores 12-bit sensor values left-aligned in 16-bit words,
+    so raw uint16 values can exceed 4095. Shift right to normalize.
+    Returns (normalized_array, bit_shift_applied).
+    """
+    if arr.max() > 4095:
+        shift = 0
+        tmp = arr
+        while tmp.max() > 4095:
+            shift += 1
+            tmp = arr >> shift
+        return tmp, shift
+    return arr, 0
+
+
+def print_stats(label: str, arr: np.ndarray):
+    arr_12, shift = normalize_to_12bit(arr)
+    print(f"\n--- {label} ---")
+    print(f"  Shape      : {arr.shape}")
+    print(f"  Raw uint16 : min={arr.min()}, max={arr.max()}, mean={arr.mean():.1f}")
+    if shift > 0:
+        print(f"  Bit shift  : >>{shift} (RPi5 PiSP left-aligned format detected)")
+        print(f"  12-bit ADU : min={arr_12.min()}, max={arr_12.max()}, mean={arr_12.mean():.1f}, std={arr_12.std():.1f}")
+    else:
+        print(f"  Std        : {arr.std():.1f}")
+
+    mean = arr_12.mean()
+    if mean < 400:
+        verdict = "OK - sensor is dark (normal bias level)"
+    elif mean < DARK_THRESHOLD_12BIT:
         verdict = "MODERATE - some ambient light detected"
     else:
         verdict = "HIGH - likely overexposed or light leak"
-    print(f"  Verdict: {verdict}")
+    print(f"  Verdict    : {verdict}")
+    return arr_12
 
 
 def main():
@@ -91,10 +111,10 @@ def main():
 
     print(f"  Capturing with gain={args.gain}x, exposure={args.exp}ms ...")
     raw_dark, cam_id = capture_raw(args.gain, exposure_us)
-    print_stats("Dark frame (lens covered)", raw_dark)
+    dark_12 = print_stats("Dark frame (lens covered)", raw_dark)
 
-    dark_mean = raw_dark.mean()
-    dark_std = raw_dark.std()
+    dark_mean = dark_12.mean()
+    dark_std = dark_12.std()
 
     # --- Test 2: Open sky / scene ---
     print("\n[Test 2] Live frame - UNCOVER THE LENS / POINT AT SKY")
@@ -103,9 +123,9 @@ def main():
 
     print(f"  Capturing with gain={args.gain}x, exposure={args.exp}ms ...")
     raw_live, _ = capture_raw(args.gain, exposure_us)
-    print_stats("Live frame (sky / scene)", raw_live)
+    live_12 = print_stats("Live frame (sky / scene)", raw_live)
 
-    live_mean = raw_live.mean()
+    live_mean = live_12.mean()
 
     # --- Summary ---
     print("\n" + "=" * 50)
@@ -114,39 +134,38 @@ def main():
 
     sensor_ok = True
 
-    if dark_mean < BIAS_OFFSET + 150:
-        print("  [PASS] Dark frame mean is low  → sensor not generating excess dark current")
+    if dark_mean < 400:
+        print(f"  [PASS] Dark frame mean={dark_mean:.0f} ADU → normal bias level, no excess dark current")
     else:
-        print(f"  [WARN] Dark frame mean={dark_mean:.0f} is HIGH → possible hot sensor / dark current issue")
+        print(f"  [WARN] Dark frame mean={dark_mean:.0f} ADU is HIGH → possible hot sensor / dark current issue")
         sensor_ok = False
 
-    if dark_std < NOISE_THRESHOLD:
-        print("  [PASS] Dark frame noise is low → read noise in normal range")
+    if dark_std < NOISE_THRESHOLD_12BIT:
+        print(f"  [PASS] Dark frame std={dark_std:.1f} ADU → read noise in normal range")
     else:
-        print(f"  [WARN] Dark frame std={dark_std:.0f} is HIGH → noisy sensor or gain too high")
+        print(f"  [WARN] Dark frame std={dark_std:.1f} ADU is HIGH → noisy sensor or gain too high")
         sensor_ok = False
 
-    if live_mean > dark_mean + 100:
-        print("  [PASS] Live frame is brighter than dark → sensor responds to light")
+    if live_mean > dark_mean + 50:
+        print(f"  [PASS] Live frame ({live_mean:.0f}) > dark ({dark_mean:.0f}) → sensor responds to light")
     else:
-        print("  [WARN] Live frame is NOT brighter than dark → possible light path issue")
+        print(f"  [WARN] Live frame is NOT brighter than dark → possible light path issue")
         sensor_ok = False
 
-    if live_mean > DARK_THRESHOLD:
-        print(f"  [INFO] Live frame mean={live_mean:.0f} is very high → lower gain/exposure or check for light leak")
+    if live_mean > DARK_THRESHOLD_12BIT:
+        print(f"  [INFO] Live frame mean={live_mean:.0f} ADU is high → overexposed or strong sky glow")
     else:
-        print(f"  [INFO] Live frame mean={live_mean:.0f} looks reasonable at gain={args.gain}x")
+        print(f"  [INFO] Live frame mean={live_mean:.0f} ADU looks reasonable")
 
     print()
     if sensor_ok:
         print("  CONCLUSION: Sensor appears healthy.")
         print("              If PiFinder still shows white screen,")
-        print("              the issue is gain/exposure settings in the app.")
-        if live_mean > DARK_THRESHOLD:
-            print(f"              Recommended starting gain for night use: 10x or less")
+        print("              update the firmware (git pull) — root cause was")
+        print("              RPi5 PiSP raw format (left-aligned 12-bit) not handled correctly.")
     else:
         print("  CONCLUSION: Sensor may have issues. Check connections and temperature.")
-        print("              If dark frame is very bright, sensor might be damaged.")
+        print("              If dark frame mean is very high (>1000 ADU), sensor may be damaged.")
 
     print("=" * 50)
 

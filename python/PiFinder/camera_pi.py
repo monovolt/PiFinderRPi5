@@ -103,6 +103,11 @@ class CameraPI(CameraInterface):
         if hasattr(self, "shared_state"):
             self.shared_state.set_cam_raw(raw_capture.copy())
 
+        # RPi5 PiSP pipeline stores 12-bit sensor values left-aligned in 16-bit words.
+        # Right-shift to bring values into the expected bit_depth range before scaling.
+        if self.profile.raw_bit_shift > 0:
+            raw_capture = raw_capture >> self.profile.raw_bit_shift
+
         # covert to 32 bit int to avoid overflow
         raw_capture = raw_capture.astype(np.float32)
 

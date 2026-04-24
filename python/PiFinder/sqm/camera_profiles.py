@@ -51,6 +51,12 @@ class CameraProfile:
     # Number of 90-degree counter-clockwise rotations (for np.rot90)
     rotation_90: int = 0
 
+    # Right-shift to apply to raw uint16 values before processing.
+    # On RPi5 PiSP pipeline, 12-bit sensor data is left-aligned in 16-bit words
+    # (e.g., SRGGB12 → RG16 CFE format), so values must be shifted right by 4.
+    # Set to 0 for sensors where values are already right-aligned.
+    raw_bit_shift: int = 0
+
     # Noise characteristics for SQM calculations
     # Read noise in ADU (from 0-second exposures at 20°C)
     # Represents the fundamental noise floor of the sensor electronics
@@ -147,11 +153,12 @@ CAMERA_PROFILES: Dict[str, CameraProfile] = {
         analog_gain=10.0,  # STARVIS sensor is very sensitive; 30 (max) causes heavy overexposure
         digital_gain=1.0,  # TODO: find optimum value
         bit_depth=12,
-        bias_offset=50.0,  # TODO: measure with dark frames
+        bias_offset=240.0,  # Measured: dark frame mean=3831 in 16-bit >> 4 = 239 ADU
         # Image cropping and orientation
         crop_y=(50, 50),  # Crop vertical edges
         crop_x=(470, 470),  # Crop horizontal edges to square
         rotation_90=0,  # No rotation needed
+        raw_bit_shift=4,  # RPi5 PiSP outputs 12-bit values left-aligned in 16-bit words
         # Noise characteristics
         read_noise_adu=3.2,  # Estimated (STARVIS, similar to IMX290)
         dark_current_rate=0.05,  # Estimated - needs measurement
@@ -162,14 +169,15 @@ CAMERA_PROFILES: Dict[str, CameraProfile] = {
         # Hardware configuration (same as imx462 - driver compatibility)
         format="SRGGB12",  # 12-bit Bayer format
         raw_size=(1920, 1080),
-        analog_gain=30.0,
+        analog_gain=10.0,
         digital_gain=1.0,  # TODO: find optimum value
         bit_depth=12,
-        bias_offset=50.0,  # TODO: measure with dark frames
+        bias_offset=240.0,  # Same as imx462 (same driver, same RPi5 PiSP behavior)
         # Image cropping and orientation (same as imx462)
         crop_y=(50, 50),  # Crop vertical edges
         crop_x=(470, 470),  # Crop horizontal edges to square
         rotation_90=0,  # No rotation needed
+        raw_bit_shift=4,  # RPi5 PiSP outputs 12-bit values left-aligned in 16-bit words
         # Noise characteristics
         read_noise_adu=3.0,  # Measured: 3.3-3.5e⁻ @ 0dB → ~3 ADU @ 12-bit
         dark_current_rate=0.04,  # Estimated - needs measurement
