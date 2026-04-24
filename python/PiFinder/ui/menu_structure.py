@@ -1,5 +1,4 @@
 from typing import Any
-from PiFinder.ui.timeentry import UITimeEntry
 from PiFinder.ui.text_menu import UITextMenu
 from PiFinder.ui.object_list import UIObjectList
 from PiFinder.ui.status import UIStatus
@@ -1097,8 +1096,7 @@ pifinder_menu = {
                         },
                         {
                             "name": _("Set Time"),
-                            "class": UITimeEntry,
-                            "custom_callback": callbacks.set_time,
+                            "callback": callbacks.sync_time_from_pi,
                         },
                         {"name": _("Reset"), "callback": callbacks.gps_reset},
                     ],

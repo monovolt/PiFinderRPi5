@@ -173,6 +173,23 @@ class UILocationList(UITextMenu):
     def update(self, force=False):
         if self.action_menu_active:
             self.draw_action_menu()
+        elif not self.item_definition["items"]:
+            self.clear_screen()
+            draw_pos = self.display_class.titlebar_height + 8
+            for line in [
+                _("No saved locations."),
+                "",
+                _("Go to GPS Status"),
+                _("and use the menu"),
+                _("to save a location."),
+            ]:
+                self.draw.text(
+                    (4, draw_pos),
+                    line,
+                    font=self.fonts.base.font,
+                    fill=self.colors.get(192),
+                )
+                draw_pos += 11
         else:
             super().update(force)
         return self.screen_update()
