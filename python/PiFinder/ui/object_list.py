@@ -359,7 +359,8 @@ class UIObjectList(UITextMenu):
         return result
 
     # Use 3-letter abbreviations for planets instead of PL1, PL2, etc.
-    # Falls back to full name if planet is not in the dictionary.
+    # Named stars show their common name (truncated to 9 chars to fit the layout).
+    # Falls back to catalog+sequence for everything else.
     def create_shortname_text(self, obj: CompositeObject) -> str:
         if obj.catalog_code == "PL" and obj.names:
             planet_abbrevs = {
@@ -374,6 +375,8 @@ class UIObjectList(UITextMenu):
                 "Pluto":   "PLU",
             }
             return planet_abbrevs.get(obj.names[0], obj.names[0])
+        if obj.catalog_code == "Str" and obj.names:
+            return obj.names[0][:9]
         return f"{obj.catalog_code}{obj.sequence}"
 
 
